@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -160,10 +161,10 @@ public class RenderEnqueue {
 
 		// Something is fatally wrong
 		//Iterable<Entity> foundentities = world.entitiesForRendering();
-		int num_entity = 1;
-		world.getEntity(num_entity++);
-        Entity founde = world.getEntity(1);
-        String message1 = founde.toString();
+		List<? extends Entity> finde = world.getEntities(EntityType.PIG,player.getBoundingBox().inflate(8.0D), Entity::isAlive);
+
+		//Entity founde = world.getEntity(1);
+        String message1 = finde.toString();
 		player.displayClientMessage(Component.literal(message1),true);
 
 
