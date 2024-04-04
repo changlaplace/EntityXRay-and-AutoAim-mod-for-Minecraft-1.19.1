@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
@@ -155,21 +156,42 @@ public class RenderEnqueue {
 	private static final Path STORE_FILE1 = Minecraft.getInstance().gameDirectory.toPath().resolve(String.format("config/%s/entity_store.json", XRay.MOD_ID));
 	private static final Path STORE_FILE2 = Minecraft.getInstance().gameDirectory.toPath().resolve(String.format("config/%s/entities_store.json", XRay.MOD_ID));
 
-	public static void entityFinder(){
+
+	public static List<? extends Entity> entityFinder(){
+		System.out.println("u pressed me in function entityfinder");
+
 		final Level world = Minecraft.getInstance().level;
 		final Player player = Minecraft.getInstance().player;
+		List<? extends Entity> finde = null;
+		if (world != null) {
+			if (player != null) {
+				finde = world.getEntities(EntityType.PIG,player.getBoundingBox().inflate(8.0D), Entity::isAlive);
+			}
+		}
+		else{
 
-		// Something is fatally wrong
-		//Iterable<Entity> foundentities = world.entitiesForRendering();
-		List<? extends Entity> finde = world.getEntities(EntityType.PIG,player.getBoundingBox().inflate(8.0D), Entity::isAlive);
+			player.displayClientMessage(Component.literal("world pointer null"),true);
+		}
 
-		finde.get(1).getBoundingBox();
+		if (finde != null) {
+//			AABB pig_1_BoundBox;
+//			pig_1_BoundBox = finde.get(1).getBoundingBox();
+			if (!finde.isEmpty()){
+				System.out.println(finde.get(0).getClass());
+				AABB pig_0_BoundBox = finde.get(0).getBoundingBox();
+				System.out.println(pig_0_BoundBox.minX +" and "+ pig_0_BoundBox.maxX);
+			}
+
+			String message1 = finde.toString();
+			player.displayClientMessage(Component.literal(message1),true);
+		}
+		else{
+			player.displayClientMessage(Component.literal("world and finder pointer null"),true);
+		}
+
+		return finde;
+
 		//Entity founde = world.getEntity(1);
-        String message1 = finde.toString();
-		player.displayClientMessage(Component.literal(message1),true);
-
-
-
 		//try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORE_FILE1.toFile()))) {
 		//	PRETTY_JSON.toJson(founde, writer);
 		//} catch (IOException e) {
