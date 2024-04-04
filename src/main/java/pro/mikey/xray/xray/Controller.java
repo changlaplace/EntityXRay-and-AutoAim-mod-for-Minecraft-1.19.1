@@ -159,4 +159,12 @@ public class Controller {
             });
         }
     }
+
+
+    //Down are the methods for entities finding
+    public static void finde() {
+        if (!Configuration.general.showOverlay.get() && Minecraft.getInstance().player != null)
+            Minecraft.getInstance().player.displayClientMessage(Component.translatable("xray.toggle.finde"), false);
+        RenderEnqueue.entityFinder();
+    }
 }

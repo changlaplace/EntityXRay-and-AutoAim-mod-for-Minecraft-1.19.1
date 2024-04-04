@@ -17,6 +17,10 @@ public class KeyBindings {
     public static KeyMapping toggleXRay = new KeyMapping(I18n.get("xray.config.toggle"), GLFW.GLFW_KEY_BACKSLASH, CATEGORY);
     public static KeyMapping toggleGui = new KeyMapping(I18n.get("xray.config.open"), GLFW.GLFW_KEY_G, CATEGORY);
 
+
+    //For finding entities
+    public static KeyMapping finde = new KeyMapping(I18n.get("xray.config.finde"), GLFW.GLFW_KEY_H, CATEGORY);
+
     public static void setup() {
     }
 
@@ -24,6 +28,9 @@ public class KeyBindings {
     public static void registerKeyBinding(RegisterKeyMappingsEvent event) {
         event.register(toggleXRay);
         event.register(toggleGui);
+
+        //find entities trial
+        event.register(finde);
     }
 
     @SubscribeEvent
@@ -38,6 +45,12 @@ public class KeyBindings {
 
         if (toggleGui.consumeClick()) {
             Minecraft.getInstance().setScreen(new GuiSelectionScreen());
+        }
+
+        //find entities trial
+        if (finde.consumeClick()){
+            Controller.finde();
+            System.out.println("u pressed me");
         }
     }
 }

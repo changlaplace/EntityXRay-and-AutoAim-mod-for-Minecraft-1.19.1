@@ -1,8 +1,14 @@
 package pro.mikey.xray.xray;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.minecraft.client.Minecraft;
+//import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -11,9 +17,16 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import pro.mikey.xray.XRay;
 import pro.mikey.xray.utils.BlockData;
 import pro.mikey.xray.utils.RenderBlockProps;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 public class RenderEnqueue {
@@ -66,6 +79,8 @@ public class RenderEnqueue {
 
 							currentState = world.getBlockState(pos);
 							currentFluid = currentState.getFluidState();
+
+
 
 							if( (currentFluid.getType() == Fluids.LAVA || currentFluid.getType() == Fluids.FLOWING_LAVA) && Controller.isLavaActive() ) {
 								renderQueue.add(new RenderBlockProps(pos.getX(), pos.getY(), pos.getZ(), 0xff0000));
@@ -130,5 +145,40 @@ public class RenderEnqueue {
 		// the block was added to the world, let's add it to the drawing buffer
 		Controller.syncRenderList.add(new RenderBlockProps(pos, dataWithUUID.getKey().getColor()) );
 		Render.requestedRefresh = true;
+	}
+
+
+
+	private static final Logger LOGGER = LogManager.getLogger();
+	private static final Gson PRETTY_JSON = new GsonBuilder().setPrettyPrinting().create();
+	private static final Path STORE_FILE1 = Minecraft.getInstance().gameDirectory.toPath().resolve(String.format("config/%s/entity_store.json", XRay.MOD_ID));
+	private static final Path STORE_FILE2 = Minecraft.getInstance().gameDirectory.toPath().resolve(String.format("config/%s/entities_store.json", XRay.MOD_ID));
+
+	public static void entityFinder(){
+		final Level world = Minecraft.getInstance().level;
+		final Player player = Minecraft.getInstance().player;
+
+		// Something is fatally wrong
+		//Iterable<Entity> foundentities = world.entitiesForRendering();
+		int num_entity = 1;
+		world.getEntity(num_entity++);
+        Entity founde = world.getEntity(1);
+        String message1 = founde.toString();
+		player.displayClientMessage(Component.literal(message1),true);
+
+
+
+		//try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORE_FILE1.toFile()))) {
+		//	PRETTY_JSON.toJson(founde, writer);
+		//} catch (IOException e) {
+		//	LOGGER.error("Failed to write json data to {}", STORE_FILE1);
+		//}
+
+		//try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORE_FILE2.toFile()))) {
+		//	PRETTY_JSON.toJson(foundentities, writer);
+		//} catch (IOException e) {
+		//	LOGGER.error("Failed to write json data to {}", STORE_FILE2);
+		//}
+
 	}
 }

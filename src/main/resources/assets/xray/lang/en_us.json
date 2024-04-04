@@ -59,5 +59,9 @@
   "xray.config.open": "Open XRay Menu",
 
   "xray.toggle.activated": "XRay activated",
-  "xray.toggle.deactivated": "XRay deactivated"
+  "xray.toggle.deactivated": "XRay deactivated",
+
+
+  "xray.config.finde": "find entities trial",
+  "xray.toggle.finde": "start to find entities"
 }
