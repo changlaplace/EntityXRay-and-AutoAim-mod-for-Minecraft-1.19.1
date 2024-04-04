@@ -163,6 +163,7 @@ public class RenderEnqueue {
 		//Iterable<Entity> foundentities = world.entitiesForRendering();
 		List<? extends Entity> finde = world.getEntities(EntityType.PIG,player.getBoundingBox().inflate(8.0D), Entity::isAlive);
 
+		finde.get(1).getBoundingBox();
 		//Entity founde = world.getEntity(1);
         String message1 = finde.toString();
 		player.displayClientMessage(Component.literal(message1),true);
