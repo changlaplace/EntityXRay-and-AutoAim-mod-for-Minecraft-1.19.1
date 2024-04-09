@@ -49,6 +49,9 @@ public class EntityData {
     public int getOrder() {
         return order;
     }
+    public SimpleEntityData toSimpleEntityData(){
+        return new SimpleEntityData(this.entityType.toShortString(),this.color,this.drawing,this.order);
+    }
 
 }
 

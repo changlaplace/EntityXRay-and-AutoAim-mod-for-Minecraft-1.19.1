@@ -7,6 +7,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.registries.ForgeRegistries;
+import pro.mikey.xray.store.EntityStore;
 import pro.mikey.xray.store.GameBlockStore;
 import pro.mikey.xray.xray.Controller;
 
@@ -42,16 +43,9 @@ public class test {
 //        }
 //        for ( Item item : ForgeRegistries.ITEMS ) {
 //           System.out.println(item.getClass().getSimpleName());
-
-        for ( Item item : ForgeRegistries.ITEMS ) {
-            if( !(item instanceof net.minecraft.world.item.BlockItem) )
-                continue;
-
-            Block block = Block.byItem(item);
-            if ( item == Items.AIR || block == Blocks.AIR || Controller.blackList.contains(block) )
-                continue; // avoids troubles
-
-//            store.add(new GameBlockStore.BlockWithItemStack(block, new ItemStack(item)));
+        EntityStore entityStore = new EntityStore();
+//        entityStore.populateGameEntities();
+  //      entityStore.write();
 
     }
-}}
+}

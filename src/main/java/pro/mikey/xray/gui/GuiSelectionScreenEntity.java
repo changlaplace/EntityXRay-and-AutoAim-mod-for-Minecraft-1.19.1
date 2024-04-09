@@ -35,6 +35,7 @@ import pro.mikey.xray.gui.utils.ScrollingList;
 import pro.mikey.xray.gui.utils.SupportButton;
 import pro.mikey.xray.keybinding.KeyBindings;
 import pro.mikey.xray.store.BlockStore;
+import pro.mikey.xray.store.EntityStore;
 import pro.mikey.xray.utils.BlockData;
 import pro.mikey.xray.xray.Controller;
 
@@ -59,8 +60,17 @@ public class GuiSelectionScreenEntity extends GuiBase {
     private ScrollingBlockList scrollList;
 
     public GuiSelectionScreenEntity() {
+
+
         super(true);
         this.setSideTitle(I18n.get("xray.single.tools"));
+        ////////////////////////////////
+        EntityStore entityStore = new EntityStore();
+        System.out.println(1);
+        entityStore.populateGameEntities();
+        System.out.println(2);
+        entityStore.write();
+        /////////////////////////////////
 
         // Inject this hear as everything is loaded
         if (ClientController.blockStore.created) {

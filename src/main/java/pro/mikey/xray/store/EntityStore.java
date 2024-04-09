@@ -1,5 +1,10 @@
 package pro.mikey.xray.store;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -11,17 +16,30 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import pro.mikey.xray.XRay;
 import pro.mikey.xray.utils.BlockData;
 import pro.mikey.xray.utils.EntityData;
+import pro.mikey.xray.utils.SimpleEntityData;
 import pro.mikey.xray.xray.Controller;
 
+import java.io.*;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class EntityStore {
 
-    private ArrayList<EntityData> storeList =new ArrayList<>();
+    private ArrayList<SimpleEntityData> SimpleStoreList =new ArrayList<>();
     private HashMap<UUID, EntityData> store = new HashMap<>();
-    private HashMap<EntityType, UUID>    storeReference = new HashMap<>();
+    private HashMap<EntityType, UUID>   storeReference = new HashMap<>();
+    private static final Random RANDOM = new Random();
+    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Path STORE_FILE = Minecraft.getInstance().gameDirectory.toPath().resolve(String.format("config/%s/entity_store.json", XRay.MOD_ID));
+    private static final Gson PRETTY_JSON = new GsonBuilder().setPrettyPrinting().create();
 
     public void put(EntityData data) {
         if( this.storeReference.containsKey(data.getEntityType()) )
@@ -30,7 +48,7 @@ public class EntityStore {
         UUID uniqueId = UUID.randomUUID();
         this.store.put(uniqueId, data);
         this.storeReference.put(data.getEntityType(), uniqueId);
-        this.storeList.add(data);
+        this.SimpleStoreList.add(data.toSimpleEntityData());
     }
 
     public void remove(EntityType entityType) {
@@ -77,7 +95,6 @@ public class EntityStore {
 
         entityData.setDrawing(!entityData.isDrawing());
     }
-    private static final Random RANDOM = new Random();
     public void populateGameEntities(){
         if(!this.store.isEmpty())
             return;
@@ -87,49 +104,35 @@ public class EntityStore {
                     false, i++);
             this.put(tobeadded);
         }
-//            if( !(item instanceof net.minecraft.world.item.BlockItem) )
-//                continue;
-//
-//            Block block = Block.byItem(item);
-//            if ( item == Items.AIR || block == Blocks.AIR || Controller.blackList.contains(block) )
-//                continue; // avoids troubles
-//
-//            store.add(new GameBlockStore.BlockWithItemStack(block, new ItemStack(item)));
+
+    }
+
+    public void write() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORE_FILE.toFile()))) {
+            PRETTY_JSON.toJson(this.SimpleStoreList, writer);
+        } catch (IOException e) {
+            LOGGER.error("Failed to write json data to {}", STORE_FILE);
+        }
+    }
+
+    public List<EntityData> read() {
+        if (!Files.exists(STORE_FILE))
+            return new ArrayList<>();
+
+        try {
+            Type type = new TypeToken<List<EntityData>>() {
+            }.getType();
+            try (BufferedReader reader = new BufferedReader(new FileReader(STORE_FILE.toFile()))) {
+                return PRETTY_JSON.fromJson(reader, type);
+            } catch (JsonSyntaxException ex) {
+                XRay.logger.log(Level.ERROR, "Failed to read json data from " + STORE_FILE);
+            }
+        } catch (IOException e) {
+            XRay.logger.log(Level.ERROR, "Failed to read json data from " + STORE_FILE);
+        }
+
+        return new ArrayList<>();
     }
 
 
-
-//    public static ArrayList<BlockData> getFromSimpleBlockList(List<BlockData.SerializableBlockData> simpleList)
-//    {
-//        ArrayList<BlockData> blockData = new ArrayList<>();
-//
-//        for (BlockData.SerializableBlockData e : simpleList) {
-//            if( e == null )
-//                continue;
-//
-//            ResourceLocation location = null;
-//            try {
-//                location = new ResourceLocation(e.getBlockName());
-//            } catch (Exception ignored) {};
-//            if( location == null )
-//                continue;
-//
-//            Block block = ForgeRegistries.BLOCKS.getValue(location);
-//            if( block == null )
-//                continue;
-//
-//            blockData.add(
-//                    new BlockData(
-//                            e.getName(),
-//                            e.getBlockName(),
-//                            e.getColor(),
-//                            new ItemStack( block, 1),
-//                            e.isDrawing(),
-//                            e.getOrder()
-//                    )
-//            );
-//        }
-//
-//        return blockData;
-//    }
 }
