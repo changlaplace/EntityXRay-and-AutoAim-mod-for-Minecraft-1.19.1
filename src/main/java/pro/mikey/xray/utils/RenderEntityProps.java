@@ -3,6 +3,7 @@ package pro.mikey.xray.utils;
 import com.google.common.base.Objects;
 import net.minecraft.core.Position;
 import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
+import net.minecraft.world.phys.AABB;
 //import net.minecraft.core.BlockPos;
 
 import javax.annotation.concurrent.Immutable;
@@ -10,22 +11,18 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class RenderEntityProps {
 	public final int color;
-	public final double minX;
-	public final double minY;
-	public final double minZ;
-	public final double maxX;
-	public final double maxY;
-	public final double maxZ;
+	public AABB Entity_AABB = null;
+
+	public RenderEntityProps(AABB Entity_AABB,int color){
+		this.Entity_AABB = Entity_AABB;
+		this.color = color;
+	}
 
 
 	public RenderEntityProps(double minX, double minY, double minZ,double maxX,double maxY,double maxZ,int color) {
-		this.minX=minX;
-		this.minY=minY;
-		this.minZ=minZ;
-		this.maxX=maxX;
-		this.maxY=maxY;
-		this.maxZ=maxZ;
-		this.color=color;
+
+		this(new AABB(minX,minY,minZ,maxX,maxY,maxZ),
+				color);
 	}
 
 	public int getColor() {
@@ -36,17 +33,17 @@ public class RenderEntityProps {
 		return new Position() {
 			@Override
 			public double x() {
-				return (minX+maxX)/2;
+				return (Entity_AABB.minX+Entity_AABB.maxX)/2;
 			}
 
 			@Override
 			public double y() {
-				return (minY+maxY)/2;
+				return (Entity_AABB.minY+Entity_AABB.maxY)/2;
 			}
 
 			@Override
 			public double z() {
-				return (minZ+maxZ)/2;
+				return (Entity_AABB.minZ+Entity_AABB.maxZ)/2;
 			}
 		};
 	}
@@ -56,7 +53,7 @@ public class RenderEntityProps {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		RenderEntityProps that = (RenderEntityProps) o;
-		return Objects.equal(this.getPos(), that.getPos());
+		return Objects.equal(this.Entity_AABB, that.Entity_AABB);
 	}
 
 	@Override

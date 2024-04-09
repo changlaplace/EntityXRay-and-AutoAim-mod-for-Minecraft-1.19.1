@@ -6,7 +6,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -15,6 +14,8 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -45,7 +46,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GuiSelectionScreen extends GuiBase {
+public class GuiSelectionScreenEntity extends GuiBase {
     private static final ResourceLocation CIRCLE = new ResourceLocation(XRay.PREFIX_GUI + "circle.png");
 
     private Button distButtons;
@@ -57,7 +58,7 @@ public class GuiSelectionScreen extends GuiBase {
     private ArrayList<BlockData> itemList, originalList;
     private ScrollingBlockList scrollList;
 
-    public GuiSelectionScreen() {
+    public GuiSelectionScreenEntity() {
         super(true);
         this.setSideTitle(I18n.get("xray.single.tools"));
 
@@ -68,6 +69,7 @@ public class GuiSelectionScreen extends GuiBase {
 
             ClientController.blockStore.created = false;
         }
+
 
         this.itemList = new ArrayList<>(Controller.getBlockStore().getStore().values());
         this.itemList.sort(Comparator.comparingInt(BlockData::getOrder));
@@ -99,12 +101,12 @@ public class GuiSelectionScreen extends GuiBase {
             ItemStack handItem = getMinecraft().player.getItemInHand(InteractionHand.MAIN_HAND);
 
             // Check if the hand item is a block or not
-            if (!(handItem.getItem() instanceof net.minecraft.world.item.BlockItem)) {
+            if (!(handItem.getItem() instanceof BlockItem)) {
                 getMinecraft().player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.invalid_hand", handItem.getHoverName().getString())), false);
                 return;
             }
 
-            getMinecraft().setScreen(new GuiAddBlock(((BlockItem) handItem.getItem()).getBlock(), GuiSelectionScreen::new));
+            getMinecraft().setScreen(new GuiAddBlock(((BlockItem) handItem.getItem()).getBlock(), GuiSelectionScreenEntity::new));
         }));
         addRenderableWidget(new SupportButtonInner(getWidth() / 2 + 79, getHeight() / 2 - 16, 120, 20, I18n.get("xray.input.add_look"), "xray.tooltips.add_block_looking_at", button -> {
             Player player = getMinecraft().player;
@@ -124,7 +126,7 @@ public class GuiSelectionScreen extends GuiBase {
                     Block lookingAt = getMinecraft().level.getBlockState(result.getBlockPos()).getBlock();
 
                     player.closeContainer();
-                    getMinecraft().setScreen(new GuiAddBlock(lookingAt, GuiSelectionScreen::new));
+                    getMinecraft().setScreen(new GuiAddBlock(lookingAt, GuiSelectionScreenEntity::new));
                 } else
                     player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
             } catch (NullPointerException ex) {
@@ -145,9 +147,8 @@ public class GuiSelectionScreen extends GuiBase {
             getMinecraft().player.closeContainer();
             getMinecraft().setScreen(new GuiHelp());
         }));
-        addRenderableWidget(new Button((getWidth() / 2 + 79) + 62, getHeight() / 2 + 58, 59, 20, Component.translatable("xray.to.exray"), button -> {
+        addRenderableWidget(new Button((getWidth() / 2 + 79) + 62, getHeight() / 2 + 58, 59, 20, Component.translatable("xray.single.close"), button -> {
             this.onClose();
-            Minecraft.getInstance().setScreen(new GuiSelectionScreenEntity());
         }));
     }
 
@@ -232,9 +233,9 @@ public class GuiSelectionScreen extends GuiBase {
 
     static class ScrollingBlockList extends ScrollingList<ScrollingBlockList.BlockSlot> {
         static final int SLOT_HEIGHT = 35;
-        public GuiSelectionScreen parent;
+        public GuiSelectionScreenEntity parent;
 
-        ScrollingBlockList(int x, int y, int width, int height, List<BlockData> blocks, GuiSelectionScreen parent) {
+        ScrollingBlockList(int x, int y, int width, int height, List<BlockData> blocks, GuiSelectionScreenEntity parent) {
             super(x, y, width, height, SLOT_HEIGHT);
             this.updateEntries(blocks);
             this.parent = parent;
@@ -244,7 +245,7 @@ public class GuiSelectionScreen extends GuiBase {
             if (entry == null)
                 return;
 
-            if (GuiSelectionScreen.hasShiftDown()) {
+            if (GuiSelectionScreenEntity.hasShiftDown()) {
                 Minecraft.getInstance().player.closeContainer();
                 Minecraft.getInstance().setScreen(new GuiEdit(entry.block));
                 return;
@@ -259,7 +260,7 @@ public class GuiSelectionScreen extends GuiBase {
             blocks.forEach(block -> this.addEntry(new BlockSlot(block, this))); // @mcp: addEntry = addEntry
         }
 
-        public static class BlockSlot extends AbstractSelectionList.Entry<ScrollingBlockList.BlockSlot> {
+        public static class BlockSlot extends Entry<BlockSlot> {
             BlockData block;
             ScrollingBlockList parent;
 
@@ -300,7 +301,7 @@ public class GuiSelectionScreen extends GuiBase {
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(
                         GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-                RenderSystem.setShaderTexture(0, GuiSelectionScreen.CIRCLE);
+                RenderSystem.setShaderTexture(0, GuiSelectionScreenEntity.CIRCLE);
                 RenderSystem.setShaderColor(0, 0, 0, .5f);
                 blit(stack, (left + entryWidth) - 35, (int) (top + (entryHeight / 2f) - 9), 0, 0, 14, 14, 14, 14);
                 RenderSystem.setShaderColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1);

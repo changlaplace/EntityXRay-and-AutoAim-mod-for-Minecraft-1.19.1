@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,6 +25,7 @@ import org.apache.logging.log4j.Logger;
 import pro.mikey.xray.XRay;
 import pro.mikey.xray.utils.BlockData;
 import pro.mikey.xray.utils.RenderBlockProps;
+import pro.mikey.xray.utils.RenderEntityProps;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -151,58 +153,40 @@ public class RenderEnqueue {
 
 
 
-	private static final Logger LOGGER = LogManager.getLogger();
-	private static final Gson PRETTY_JSON = new GsonBuilder().setPrettyPrinting().create();
-	private static final Path STORE_FILE1 = Minecraft.getInstance().gameDirectory.toPath().resolve(String.format("config/%s/entity_store.json", XRay.MOD_ID));
-	private static final Path STORE_FILE2 = Minecraft.getInstance().gameDirectory.toPath().resolve(String.format("config/%s/entities_store.json", XRay.MOD_ID));
 
 
-	public static List<? extends Entity> entityFinder(){
+	public static Set<RenderEntityProps> EntityFinder(){
+
 		System.out.println("u pressed me in function entityfinder");
-
+		final Set<RenderEntityProps> renderEntityQueue = new HashSet<>();
 		final Level world = Minecraft.getInstance().level;
 		final Player player = Minecraft.getInstance().player;
-		List<? extends Entity> finde = null;
+		List<? extends Entity> PigFoundList = null;
 		if (world != null) {
 			if (player != null) {
-				finde = world.getEntities(EntityType.PIG,player.getBoundingBox().inflate(8.0D), Entity::isAlive);
+				PigFoundList = world.getEntities(EntityType.PIG,player.getBoundingBox().inflate(8.0D), Entity::isAlive);
 			}
 		}
 		else{
-
 			player.displayClientMessage(Component.literal("world pointer null"),true);
 		}
 
-		if (finde != null) {
+		if (PigFoundList != null) {
 //			AABB pig_1_BoundBox;
 //			pig_1_BoundBox = finde.get(1).getBoundingBox();
-			if (!finde.isEmpty()){
-				System.out.println(finde.get(0).getClass());
-				AABB pig_0_BoundBox = finde.get(0).getBoundingBox();
-				System.out.println(pig_0_BoundBox.minX +" and "+ pig_0_BoundBox.maxX);
+			if (!PigFoundList.isEmpty()){
+				PigFoundList.forEach(individual -> {
+					Controller.EntitiesNeededRender.add(individual);
+					renderEntityQueue.add(new RenderEntityProps(individual.getBoundingBox(),11045301));
+				});
 			}
 
-			String message1 = finde.toString();
-			player.displayClientMessage(Component.literal(message1),true);
-		}
-		else{
-			player.displayClientMessage(Component.literal("world and finder pointer null"),true);
+			player.displayClientMessage(Component.literal(renderEntityQueue.toString()),true);
+			System.out.println(Component.literal(renderEntityQueue.toString()));
 		}
 
-		return finde;
+		return renderEntityQueue;
 
-		//Entity founde = world.getEntity(1);
-		//try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORE_FILE1.toFile()))) {
-		//	PRETTY_JSON.toJson(founde, writer);
-		//} catch (IOException e) {
-		//	LOGGER.error("Failed to write json data to {}", STORE_FILE1);
-		//}
-
-		//try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORE_FILE2.toFile()))) {
-		//	PRETTY_JSON.toJson(foundentities, writer);
-		//} catch (IOException e) {
-		//	LOGGER.error("Failed to write json data to {}", STORE_FILE2);
-		//}
 
 	}
 }

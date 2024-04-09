@@ -43,4 +43,26 @@ public class Events
 			Render.renderBlocks(event);
 		}
 	}
+
+
+	//belows are for entity counting and rendering
+	@SubscribeEvent
+	public static void tickEndFindEntity( TickEvent.ClientTickEvent event ) {
+		if ( event.phase == TickEvent.Phase.END && Minecraft.getInstance().player != null && Minecraft.getInstance().level != null ) {
+			Controller.requestEntityFinder( true );
+		}
+	}
+	@SubscribeEvent
+	public static void onWorldRenderLastEntity( RenderLevelStageEvent event ) // Called when drawing the world.
+	{
+		if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) {
+			return;
+		}
+
+		if ( Controller.EntityxrayActive && Minecraft.getInstance().player != null )
+		{
+			// this is a world pos of the player
+			Render.renderEntities(event);
+		}
+	}
 }

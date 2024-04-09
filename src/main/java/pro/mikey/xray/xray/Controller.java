@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.Blocks;
 import pro.mikey.xray.Configuration;
 import pro.mikey.xray.store.BlockStore;
 import pro.mikey.xray.utils.RenderBlockProps;
+import pro.mikey.xray.utils.RenderEntityProps;
 
 import java.util.*;
 
@@ -159,10 +160,55 @@ public class Controller {
     }
 
 
-    //Down are the methods for entities finding
-    public static void finde() {
-        if (!Configuration.general.showOverlay.get() && Minecraft.getInstance().player != null)
-            Minecraft.getInstance().player.displayClientMessage(Component.translatable("xray.toggle.finde"), false);
-        RenderEnqueue.entityFinder();
+
+
+    //Down are the methods for entities finding########################################
+    public static boolean EntityxrayActive = false;
+    public static Set<Entity> EntitiesNeededRender = Collections.synchronizedSet(new HashSet<>());
+    public static Set<RenderEntityProps> EntitysyncRenderList = Collections.synchronizedSet(new HashSet<>());
+    public static void toggleEntityXRay() {
+        System.out.println("active toggleEntityXray function");
+        if (!EntityxrayActive) // enable drawing
+        {
+            EntitysyncRenderList.clear(); // first, clear the buffer
+            EntityxrayActive = true; // then, enable drawing
+            requestEntityFinder(true); // finally, force a refresh
+
+            if (!Configuration.general.showOverlay.get() && Minecraft.getInstance().player != null)
+                Minecraft.getInstance().player.displayClientMessage(Component.literal("entity xray active"),true);
+        } else // disable drawing
+        {
+            if (!Configuration.general.showOverlay.get() && Minecraft.getInstance().player != null)
+                Minecraft.getInstance().player.displayClientMessage(Component.literal("entity xray deactivate"),true);
+
+            EntityxrayActive = false;
+        }
     }
+    //here force always equals true,i dont dare to change lol
+    public static synchronized void requestEntityFinder(boolean force) {
+        if (EntityxrayActive && (force) ) // world/player check done by xrayActive()
+        {
+            System.out.println("active requestEntityFinder function");
+            //updatePlayerPosition(); // since we're about to run, update the last known position
+            Util.backgroundExecutor().execute(() -> {
+                //isSearching = true;
+                // Scan for the blocks
+                Set<RenderEntityProps> c = RenderEnqueue.EntityFinder();
+                EntitysyncRenderList.clear();
+                EntitysyncRenderList.addAll(c);
+                //isSearching = false;
+
+                // Tell the render to update
+                Render.EntityrequestedRefresh = true;
+                if (!EntitysyncRenderList.isEmpty()){
+                    System.out.println("added into controler set successfully");
+                }
+            });
+        }
+    }
+//    public static void finde() {
+//        if (!Configuration.general.showOverlay.get() && Minecraft.getInstance().player != null)
+//            Minecraft.getInstance().player.displayClientMessage(Component.translatable("xray.toggle.finde"), false);
+//        RenderEnqueue.entityFinder();
+//    }
 }

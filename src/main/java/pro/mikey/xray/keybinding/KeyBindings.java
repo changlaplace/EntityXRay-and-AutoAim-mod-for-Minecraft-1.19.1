@@ -8,6 +8,7 @@ import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.glfw.GLFW;
 import pro.mikey.xray.gui.GuiSelectionScreen;
+import pro.mikey.xray.gui.GuiSelectionScreenEntity;
 import pro.mikey.xray.xray.Controller;
 
 
@@ -19,7 +20,8 @@ public class KeyBindings {
 
 
     //For finding entities
-    public static KeyMapping finde = new KeyMapping(I18n.get("xray.config.finde"), GLFW.GLFW_KEY_H, CATEGORY);
+    public static KeyMapping toggleEntityXRay = new KeyMapping(I18n.get("xray.config.finde"), GLFW.GLFW_KEY_J, CATEGORY);
+    public static KeyMapping toggleEntityXRayGui = new KeyMapping(I18n.get("entity.xray.gui"), GLFW.GLFW_KEY_H, CATEGORY);
 
     public static void setup() {
     }
@@ -30,7 +32,8 @@ public class KeyBindings {
         event.register(toggleGui);
 
         //find entities trial
-        event.register(finde);
+        event.register(toggleEntityXRay);
+        event.register(toggleEntityXRayGui);
     }
 
     @SubscribeEvent
@@ -48,9 +51,12 @@ public class KeyBindings {
         }
 
         //find entities trial
-        if (finde.consumeClick()){
-            Controller.finde();
-            System.out.println("u pressed me");
+        if (toggleEntityXRay.consumeClick()){
+            Controller.toggleEntityXRay();
+        }
+
+        if (toggleEntityXRayGui.consumeClick()){
+            Minecraft.getInstance().setScreen(new GuiSelectionScreenEntity());
         }
     }
 }

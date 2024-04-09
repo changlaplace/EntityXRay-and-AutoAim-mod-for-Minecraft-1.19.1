@@ -101,4 +101,102 @@ public class Render {
             GL11.glDisable(GL11.GL_LINE_SMOOTH);
         }
 	}
+    //Render for entities
+
+
+    private static VertexBuffer EntityvertexBuffer;
+    public static boolean EntityrequestedRefresh = false;
+
+    static void renderEntities(RenderLevelStageEvent event){
+        if (EntityvertexBuffer == null || EntityrequestedRefresh) {
+            System.out.println("rendered by tick");
+
+            EntityrequestedRefresh = false;
+            EntityvertexBuffer = new VertexBuffer();
+
+            Tesselator tessellator = Tesselator.getInstance();
+            BufferBuilder buffer = tessellator.getBuilder();
+
+            var opacity = 1F;
+
+            buffer.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+
+            Controller.EntitysyncRenderList.forEach(blockProps -> {
+                if (blockProps == null) {
+                    return;
+                }
+
+                //final float size = 1.0f;
+                final double x = blockProps.Entity_AABB.minX, y = blockProps.Entity_AABB.minY, z = blockProps.Entity_AABB.minZ;
+                final double sizex = blockProps.Entity_AABB.maxX-x, sizey = blockProps.Entity_AABB.maxY-y, sizez = blockProps.Entity_AABB.maxZ-z;
+
+                final float red = (blockProps.getColor() >> 16 & 0xff) / 255f;
+                final float green = (blockProps.getColor() >> 8 & 0xff) / 255f;
+                final float blue = (blockProps.getColor() & 0xff) / 255f;
+
+                buffer.vertex(x, y + sizey, z).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x + sizex, y + sizey, z).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x + sizex, y + sizey, z).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x + sizex, y + sizey, z + sizez).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x + sizex, y + sizey, z + sizez).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x, y + sizey, z + sizez).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x, y + sizey, z + sizez).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x, y + sizey, z).color(red, green, blue, opacity).endVertex();
+
+                // BOTTOM
+                buffer.vertex(x + sizex, y, z).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x + sizex, y, z + sizez).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x + sizex, y, z + sizez).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x, y, z + sizez).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x, y, z + sizez).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x, y, z).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x, y, z).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x + sizex, y, z).color(red, green, blue, opacity).endVertex();
+
+                // Edge 1
+                buffer.vertex(x + sizex, y, z + sizez).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x + sizex, y + sizey, z + sizez).color(red, green, blue, opacity).endVertex();
+
+                // Edge 2
+                buffer.vertex(x + sizex, y, z).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x + sizex, y + sizey, z).color(red, green, blue, opacity).endVertex();
+
+                // Edge 3
+                buffer.vertex(x, y, z + sizez).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x, y + sizey, z + sizez).color(red, green, blue, opacity).endVertex();
+
+                // Edge 4
+                buffer.vertex(x, y, z).color(red, green, blue, opacity).endVertex();
+                buffer.vertex(x, y + sizey, z).color(red, green, blue, opacity).endVertex();
+            });
+
+            EntityvertexBuffer.bind();
+            EntityvertexBuffer.upload(buffer.end());
+            VertexBuffer.unbind();
+        }
+
+        if (EntityvertexBuffer != null) {
+            Vec3 view = Minecraft.getInstance().getEntityRenderDispatcher().camera.getPosition();
+
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GL11.glEnable(GL11.GL_LINE_SMOOTH);
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+
+            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+            PoseStack matrix = event.getPoseStack();
+            matrix.pushPose();
+            matrix.translate(-view.x, -view.y, -view.z);
+
+            EntityvertexBuffer.bind();
+            EntityvertexBuffer.drawWithShader(matrix.last().pose(), event.getProjectionMatrix().copy(), RenderSystem.getShader());
+            VertexBuffer.unbind();
+            matrix.popPose();
+
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        }
+    }
 }

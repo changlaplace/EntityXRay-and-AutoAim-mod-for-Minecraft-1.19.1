@@ -61,7 +61,10 @@
   "xray.toggle.activated": "XRay activated",
   "xray.toggle.deactivated": "XRay deactivated",
 
-
+  "xray.toggle.Entityactivated": "Entity XRay activated",
+  "xray.toggle.Entitydeactivated": "Entity XRay deactivated",
   "xray.config.finde": "find entities trial",
-  "xray.toggle.finde": "start to find entities"
+  "xray.toggle.finde": "start to find entities",
+  "entity.xray.gui": "toggle the entity xray gui",
+  "xray.to.exray" : "Entity Xray"
 }
