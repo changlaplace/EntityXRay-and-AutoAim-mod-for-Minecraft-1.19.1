@@ -3,7 +3,7 @@
 
 Just like XRay Mod but for entities. I learned a lot from that code and because of laziness I build the two mod together so that you may find XRay mod in it.
 
-![Forge Downloads](./.github/assets/show1.png)
+![Forge Downloads](./.github/assets/show1.png)]
 ![Forge Downloads](./.github/assets/show2.png)
 
 
