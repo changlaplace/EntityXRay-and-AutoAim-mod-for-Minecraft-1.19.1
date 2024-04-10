@@ -32,6 +32,9 @@ public class Configuration
     public static class Store {
         public final ForgeConfigSpec.IntValue radius;
         public final ForgeConfigSpec.BooleanValue lavaActive;
+        ///////////////////////////
+        public ForgeConfigSpec.IntValue EntityRadius;
+        //////////////////////////
 
         Store() {
             BUILDER.comment("DO NOT TOUCH!").push("store");
@@ -43,10 +46,20 @@ public class Configuration
             lavaActive = BUILDER
                     .comment("Memory value for if you're currently wanting Lava to be rendered into the mix")
                     .define("lavaActive", false);
+            ///////
+            EntityRadius = BUILDER
+                    .comment("DO NOT TOUCH!", "This is not for you.")
+                    .defineInRange("EntityRadius", 2, 0, 5);
 
             BUILDER.pop();
         }
+
     }
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();
+
+
+    //////XRayEntity
+    public static int EntityXRayRadius;
+
 }

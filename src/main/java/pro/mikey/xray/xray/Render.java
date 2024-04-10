@@ -121,6 +121,9 @@ public class Render {
 
             buffer.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
 
+            ///////
+            //GL11.glLineWidth(50);
+
             Controller.EntitysyncRenderList.forEach(blockProps -> {
                 if (blockProps == null) {
                     return;
@@ -182,6 +185,7 @@ public class Render {
             GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glEnable(GL11.GL_LINE_SMOOTH);
             GL11.glDisable(GL11.GL_DEPTH_TEST);
+
 
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
 

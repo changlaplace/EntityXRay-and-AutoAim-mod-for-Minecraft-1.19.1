@@ -22,8 +22,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pro.mikey.xray.ClientController;
+import pro.mikey.xray.Configuration;
 import pro.mikey.xray.XRay;
 import pro.mikey.xray.utils.BlockData;
+import pro.mikey.xray.utils.EntityData;
 import pro.mikey.xray.utils.RenderBlockProps;
 import pro.mikey.xray.utils.RenderEntityProps;
 
@@ -32,6 +35,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
+
+import static pro.mikey.xray.ClientController.entityStore;
 
 public class RenderEnqueue {
 	/**
@@ -157,36 +162,49 @@ public class RenderEnqueue {
 
 	public static Set<RenderEntityProps> EntityFinder(){
 
-		System.out.println("u pressed me in function entityfinder");
+		//System.out.println("u pressed me in function entityfinder");
 		final Set<RenderEntityProps> renderEntityQueue = new HashSet<>();
 		final Level world = Minecraft.getInstance().level;
 		final Player player = Minecraft.getInstance().player;
-		List<? extends Entity> PigFoundList = null;
-		if (world != null) {
-			if (player != null) {
-				PigFoundList = world.getEntities(EntityType.PIG,player.getBoundingBox().inflate(8.0D), Entity::isAlive);
+		final AABB searchAABB = player.getBoundingBox().inflate(Configuration.store.EntityRadius.get()*3.0*16).setMinY(-100).setMaxY(320);
+		for (EntityData entityData : entityStore.getStore().values()){
+			if (entityData.isDrawing()){
+				List<? extends Entity> EntityFoundList = new ArrayList<>();
+				EntityFoundList = world.getEntities(entityData.getEntityType(),searchAABB, Entity::isAlive);
+				if (!EntityFoundList.isEmpty()){
+					EntityFoundList.forEach(individual -> {
+						Controller.EntitiesNeededRender.add(individual);
+						renderEntityQueue.add(new RenderEntityProps(individual.getBoundingBox(),entityData.getColor()));
+						/////for debug
+						//player.displayClientMessage(Component.literal(renderEntityQueue.toString()),true);
+						//System.out.println(Component.literal(renderEntityQueue.toString()));
+					});
+				}
 			}
 		}
-		else{
-			player.displayClientMessage(Component.literal("world pointer null"),true);
-		}
-
-		if (PigFoundList != null) {
-//			AABB pig_1_BoundBox;
-//			pig_1_BoundBox = finde.get(1).getBoundingBox();
-			if (!PigFoundList.isEmpty()){
-				PigFoundList.forEach(individual -> {
-					Controller.EntitiesNeededRender.add(individual);
-					renderEntityQueue.add(new RenderEntityProps(individual.getBoundingBox(),11045301));
-				});
-			}
-
-			player.displayClientMessage(Component.literal(renderEntityQueue.toString()),true);
-			System.out.println(Component.literal(renderEntityQueue.toString()));
-		}
-
 		return renderEntityQueue;
 
-
+//		if (world != null) {
+//			if (player != null) {
+//				EntityFoundList = world.getEntities(EntityType.PIG,player.getBoundingBox().inflate(8.0D), Entity::isAlive);
+//			}
+//		}
+//		else{
+//			player.displayClientMessage(Component.literal("world pointer null"),true);
+//		}
+//
+//		if (EntityFoundList != null) {
+////			AABB pig_1_BoundBox;
+////			pig_1_BoundBox = finde.get(1).getBoundingBox();
+//			if (!EntityFoundList.isEmpty()){
+//				EntityFoundList.forEach(individual -> {
+//					Controller.EntitiesNeededRender.add(individual);
+//					renderEntityQueue.add(new RenderEntityProps(individual.getBoundingBox(),11045301));
+//				});
+//			}
+//
+//			player.displayClientMessage(Component.literal(renderEntityQueue.toString()),true);
+//			System.out.println(Component.literal(renderEntityQueue.toString()));
+//		}
 	}
 }

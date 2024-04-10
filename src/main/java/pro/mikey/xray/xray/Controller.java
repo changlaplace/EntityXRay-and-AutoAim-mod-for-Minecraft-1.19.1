@@ -94,6 +94,16 @@ public class Controller {
         return Math.max(1, getRadius());
     }
 
+    ///////EXRAY
+    public static int getEntityRadius(){
+        return Mth.clamp(Configuration.store.EntityRadius.get(), 0, maxStepsToScan) * 3;
+    }
+    public static int getEntityVisualRadius(){
+        return Math.max(1, getRadius());
+    }
+
+    ///////////
+
     public static void incrementCurrentDist() {
         if (Configuration.store.radius.get() < maxStepsToScan)
             Configuration.store.radius.set(Configuration.store.radius.get() + 1);
@@ -107,7 +117,14 @@ public class Controller {
         else
             Configuration.store.radius.set(maxStepsToScan);
     }
-
+    //////EXRay
+    public static void decrementEntityCurrentDist() {
+        if (Configuration.store.EntityRadius.get() > 0)
+            Configuration.store.EntityRadius.set(Configuration.store.EntityRadius.get() - 1);
+        else
+            Configuration.store.EntityRadius.set(maxStepsToScan);
+    }
+    /////////
     /**
      * Precondition: world and player must be not null
      * Has player moved since the last region scan?

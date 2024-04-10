@@ -56,6 +56,7 @@ public class ClientController {
         Controller.getBlockStore().setStore(map);
 
         ////////////EXray
+
         ArrayList<SimpleEntityData> SavedEntityData = entityStore.read();
         if (!SavedEntityData.isEmpty()){
             entityStore.setStorewithSimple(SavedEntityData);

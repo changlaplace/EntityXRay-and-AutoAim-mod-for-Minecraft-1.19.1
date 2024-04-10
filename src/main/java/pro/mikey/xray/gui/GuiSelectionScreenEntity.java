@@ -27,6 +27,7 @@ import net.minecraft.world.phys.Vec3;
 import pro.mikey.xray.ClientController;
 import pro.mikey.xray.Configuration;
 import pro.mikey.xray.XRay;
+import pro.mikey.xray.gui.manage.EntityGuiEdit;
 import pro.mikey.xray.gui.manage.GuiAddBlock;
 import pro.mikey.xray.gui.manage.GuiBlockList;
 import pro.mikey.xray.gui.manage.GuiEdit;
@@ -92,7 +93,7 @@ public class GuiSelectionScreenEntity extends GuiBase {
 
 
         this.entityList = new ArrayList<>(ClientController.entityStore.getStore().values());
-        this.entityList.sort(Comparator.comparing(EntityData::isDrawing));
+        this.entityList.sort(Comparator.comparing(EntityData::isDrawing).reversed());
 
         this.originalList = this.entityList;
     }
@@ -157,15 +158,17 @@ public class GuiSelectionScreenEntity extends GuiBase {
 //            Controller.toggleLava();
 //            button.setMessage(Component.translatable("xray.input.show-lava", Controller.isLavaActive()));
 //        }));
+        addRenderableWidget(new Button(getWidth() / 2 + 79, getHeight() / 2 + 58, 60, 20, Component.translatable("xray.single.help"), button -> {
+            getMinecraft().player.closeContainer();
+            getMinecraft().setScreen(new GuiHelp());
+        }));
 
         addRenderableWidget(distButtons = new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 + 36, 120, 20, I18n.get("xray.input.distance", Controller.getVisualRadius()), "xray.tooltips.distance", button -> {
             Controller.incrementCurrentDist();
             button.setMessage(Component.translatable("xray.input.distance", Controller.getVisualRadius()));
         }));
-//        addRenderableWidget(new Button(getWidth() / 2 + 79, getHeight() / 2 + 58, 60, 20, Component.translatable("xray.single.help"), button -> {
-//            getMinecraft().player.closeContainer();
-//            getMinecraft().setScreen(new GuiHelp());
-//        }));
+
+
         addRenderableWidget(new Button((getWidth() / 2 + 79) + 62, getHeight() / 2 + 58, 59, 20, Component.translatable("xray.single.close"), button -> {
             this.onClose();
         }));
@@ -218,8 +221,8 @@ public class GuiSelectionScreenEntity extends GuiBase {
             this.setFocused(search);
 
         if (mouse == 1 && distButtons.isMouseOver(x, y)) {
-            Controller.decrementCurrentDist();
-            distButtons.setMessage(Component.translatable("xray.input.distance", Controller.getVisualRadius()));
+            Controller.decrementEntityCurrentDist();
+            distButtons.setMessage(Component.translatable("xray.input.distance", Controller.getEntityVisualRadius()));
             distButtons.playDownSound(Minecraft.getInstance().getSoundManager());
         }
 
@@ -237,10 +240,10 @@ public class GuiSelectionScreenEntity extends GuiBase {
 
     @Override
     public void removed() {
-        Configuration.store.radius.save();
-        ClientController.blockStore.write(new ArrayList<>(Controller.getBlockStore().getStore().values()));
-
-        Controller.requestBlockFinder(true);
+        Configuration.store.EntityRadius.save();
+        //ClientController.blockStore.write(new ArrayList<>(Controller.getBlockStore().getStore().values()));
+        ClientController.entityStore.write();
+        //Controller.requestBlockFinder(true);
         super.removed();
     }
 
@@ -266,7 +269,7 @@ public class GuiSelectionScreenEntity extends GuiBase {
 
             if (GuiSelectionScreenEntity.hasShiftDown()) {
                 Minecraft.getInstance().player.closeContainer();
-//                Minecraft.getInstance().setScreen(new GuiEdit(entry.entity));
+                Minecraft.getInstance().setScreen(new EntityGuiEdit(entry.entity));
                 return;
             }
 
