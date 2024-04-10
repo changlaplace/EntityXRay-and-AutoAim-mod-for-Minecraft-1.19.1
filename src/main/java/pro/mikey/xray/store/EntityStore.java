@@ -33,7 +33,7 @@ import java.util.*;
 
 public class EntityStore {
 
-    private ArrayList<SimpleEntityData> SimpleStoreList =new ArrayList<>();
+//    private ArrayList<SimpleEntityData> SimpleStoreList =new ArrayList<>();
     private HashMap<UUID, EntityData> store = new HashMap<>();
     private HashMap<EntityType, UUID>   storeReference = new HashMap<>();
     private static final Random RANDOM = new Random();
@@ -48,7 +48,7 @@ public class EntityStore {
         UUID uniqueId = UUID.randomUUID();
         this.store.put(uniqueId, data);
         this.storeReference.put(data.getEntityType(), uniqueId);
-        this.SimpleStoreList.add(data.toSimpleEntityData());
+       // this.SimpleStoreList.add(data.toSimpleEntityData());
     }
 
     public void remove(EntityType entityType) {
@@ -70,6 +70,12 @@ public class EntityStore {
 
         store.forEach(this::put);
     }
+    public void setStorewithSimple(ArrayList<SimpleEntityData> store) {
+        this.store.clear();
+        this.storeReference.clear();
+
+        store.forEach(simpleEntityData -> this.put(simpleEntityData.toEntityData()));
+    }
 
     public Pair<EntityData, UUID> getStoreByReference(EntityType entityType) {
         UUID uniqueId = storeReference.get(entityType);
@@ -83,8 +89,8 @@ public class EntityStore {
         return new ImmutablePair<>(entityData, uniqueId);
     }
 
-    public void toggleDrawing(EntityData data) {
-        UUID uniqueId = storeReference.get(data.getEntityType());
+    public void toggleDrawing(EntityType data) {
+        UUID uniqueId = storeReference.get(data);
         if( uniqueId == null )
             return;
 
@@ -95,6 +101,7 @@ public class EntityStore {
 
         entityData.setDrawing(!entityData.isDrawing());
     }
+
     public void populateGameEntities(){
         if(!this.store.isEmpty())
             return;
@@ -108,19 +115,23 @@ public class EntityStore {
     }
 
     public void write() {
+        ArrayList<SimpleEntityData> SimpleStoreList = new ArrayList<>();
+        for (EntityData entityData : store.values()){
+            SimpleStoreList.add(entityData.toSimpleEntityData());
+        }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORE_FILE.toFile()))) {
-            PRETTY_JSON.toJson(this.SimpleStoreList, writer);
+            PRETTY_JSON.toJson(SimpleStoreList, writer);
         } catch (IOException e) {
             LOGGER.error("Failed to write json data to {}", STORE_FILE);
         }
     }
 
-    public List<EntityData> read() {
+    public ArrayList<SimpleEntityData> read() {
         if (!Files.exists(STORE_FILE))
             return new ArrayList<>();
 
         try {
-            Type type = new TypeToken<List<EntityData>>() {
+            Type type = new TypeToken<ArrayList<SimpleEntityData>>() {
             }.getType();
             try (BufferedReader reader = new BufferedReader(new FileReader(STORE_FILE.toFile()))) {
                 return PRETTY_JSON.fromJson(reader, type);

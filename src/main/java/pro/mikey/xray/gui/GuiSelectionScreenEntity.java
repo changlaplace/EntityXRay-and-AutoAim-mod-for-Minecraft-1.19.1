@@ -65,11 +65,18 @@ public class GuiSelectionScreenEntity extends GuiBase {
         super(true);
         this.setSideTitle(I18n.get("xray.single.tools"));
         ////////////////////////////////
-        EntityStore entityStore = new EntityStore();
-        System.out.println(1);
-        entityStore.populateGameEntities();
-        System.out.println(2);
-        entityStore.write();
+//        EntityStore entityStore = new EntityStore();
+//        entityStore.populateGameEntities();
+//        System.out.println(0);
+//        entityStore.write();
+//        System.out.println(1);
+//        entityStore.setStorewithSimple(entityStore.read());;
+//        System.out.println(entityStore.getStore().isEmpty());
+//        System.out.println(2);
+//        entityStore.toggleDrawing(EntityType.ALLAY);
+//        System.out.println(3);
+//        entityStore.write();
+//        System.out.println(4);
         /////////////////////////////////
 
         // Inject this hear as everything is loaded

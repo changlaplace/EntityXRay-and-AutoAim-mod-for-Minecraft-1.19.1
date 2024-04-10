@@ -1,6 +1,7 @@
 package pro.mikey.xray.utils;
 
 import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class SimpleEntityData {
 
@@ -48,5 +49,14 @@ public class SimpleEntityData {
     public void setOrder(int order) {
         this.order = order;
     }
+    public EntityData toEntityData(){
+        for ( EntityType entityType : ForgeRegistries.ENTITY_TYPES ) {
+            if (entityType.toShortString().equals(this.entityString)){
+                return new EntityData(entityType,this.color,this.drawing,this.order);
+            }
+        }
+        return null;
+    }
+
 }
 
