@@ -37,6 +37,7 @@ import pro.mikey.xray.keybinding.KeyBindings;
 import pro.mikey.xray.store.BlockStore;
 import pro.mikey.xray.store.EntityStore;
 import pro.mikey.xray.utils.BlockData;
+import pro.mikey.xray.utils.EntityData;
 import pro.mikey.xray.xray.Controller;
 
 import javax.annotation.Nullable;
@@ -56,8 +57,8 @@ public class GuiSelectionScreenEntity extends GuiBase {
 
     private String lastSearch = "";
 
-    private ArrayList<BlockData> itemList, originalList;
-    private ScrollingBlockList scrollList;
+    private ArrayList<EntityData> entityList, originalList;
+    private ScrollingEntityList scrollList;
 
     public GuiSelectionScreenEntity() {
 
@@ -80,90 +81,91 @@ public class GuiSelectionScreenEntity extends GuiBase {
         /////////////////////////////////
 
         // Inject this hear as everything is loaded
-        if (ClientController.blockStore.created) {
-            List<BlockData.SerializableBlockData> blocks = ClientController.blockStore.populateDefault();
-            Controller.getBlockStore().setStore(BlockStore.getFromSimpleBlockList(blocks));
+        if (ClientController.entityStore.getStore().isEmpty()) {
+//            List<BlockData.SerializableBlockData> blocks = ClientController.blockStore.populateDefault();
+//            Controller.getBlockStore().setStore(BlockStore.getFromSimpleBlockList(blocks));
+//            ClientController.blockStore.created = false;
 
-            ClientController.blockStore.created = false;
+            ClientController.entityStore.setStorewithSimple(ClientController.entityStore.read());
+            ClientController.entityStore.write();
         }
 
 
-        this.itemList = new ArrayList<>(Controller.getBlockStore().getStore().values());
-        this.itemList.sort(Comparator.comparingInt(BlockData::getOrder));
+        this.entityList = new ArrayList<>(ClientController.entityStore.getStore().values());
+        this.entityList.sort(Comparator.comparing(EntityData::isDrawing));
 
-        this.originalList = this.itemList;
+        this.originalList = this.entityList;
     }
 
     @Override
     public void init() {
         if (getMinecraft().player == null)
             return;
-
         this.render = this.itemRenderer;
         this.children().clear();
 
-        this.scrollList = new ScrollingBlockList((getWidth() / 2) - 37, getHeight() / 2 + 10, 203, 185, this.itemList, this);
+        this.scrollList = new ScrollingEntityList((getWidth() / 2) - 37, getHeight() / 2 + 10, 203, 185, this.entityList, this);
         addRenderableWidget(this.scrollList);
 
         this.search = new EditBox(getFontRender(), getWidth() / 2 - 137, getHeight() / 2 - 105, 202, 18, Component.empty());
         this.search.setCanLoseFocus(true);
 
-        // side bar buttons
-        addRenderableWidget(new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 - 60, 120, 20, I18n.get("xray.input.add"), "xray.tooltips.add_block", button -> {
-            getMinecraft().player.closeContainer();
-            getMinecraft().setScreen(new GuiBlockList());
-        }));
-        addRenderableWidget(new SupportButtonInner(getWidth() / 2 + 79, getHeight() / 2 - 38, 120, 20, I18n.get("xray.input.add_hand"), "xray.tooltips.add_block_in_hand", button -> {
-            getMinecraft().player.closeContainer();
-            ItemStack handItem = getMinecraft().player.getItemInHand(InteractionHand.MAIN_HAND);
-
-            // Check if the hand item is a block or not
-            if (!(handItem.getItem() instanceof BlockItem)) {
-                getMinecraft().player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.invalid_hand", handItem.getHoverName().getString())), false);
-                return;
-            }
-
-            getMinecraft().setScreen(new GuiAddBlock(((BlockItem) handItem.getItem()).getBlock(), GuiSelectionScreenEntity::new));
-        }));
-        addRenderableWidget(new SupportButtonInner(getWidth() / 2 + 79, getHeight() / 2 - 16, 120, 20, I18n.get("xray.input.add_look"), "xray.tooltips.add_block_looking_at", button -> {
-            Player player = getMinecraft().player;
-            if (getMinecraft().level == null || player == null)
-                return;
-
-            this.onClose();
-            try {
-                Vec3 look = player.getLookAngle();
-                Vec3 start = new Vec3(player.blockPosition().getX(), player.blockPosition().getY() + player.getEyeHeight(), player.blockPosition().getZ());
-                Vec3 end = new Vec3(player.blockPosition().getX() + look.x * 100, player.blockPosition().getY() + player.getEyeHeight() + look.y * 100, player.blockPosition().getZ() + look.z * 100);
-
-                ClipContext context = new ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player);
-                BlockHitResult result = getMinecraft().level.clip(context);
-
-                if (result.getType() == HitResult.Type.BLOCK) {
-                    Block lookingAt = getMinecraft().level.getBlockState(result.getBlockPos()).getBlock();
-
-                    player.closeContainer();
-                    getMinecraft().setScreen(new GuiAddBlock(lookingAt, GuiSelectionScreenEntity::new));
-                } else
-                    player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
-            } catch (NullPointerException ex) {
-                player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.thats_odd")), false);
-            }
-        }));
-
-        addRenderableWidget(distButtons = new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 + 6, 120, 20, I18n.get("xray.input.show-lava", Controller.isLavaActive()), "xray.tooltips.show_lava", button -> {
-            Controller.toggleLava();
-            button.setMessage(Component.translatable("xray.input.show-lava", Controller.isLavaActive()));
-        }));
+//        // side bar buttons
+//        addRenderableWidget(new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 - 60, 120, 20, I18n.get("xray.input.add"), "xray.tooltips.add_block", button -> {
+//            getMinecraft().player.closeContainer();
+//            getMinecraft().setScreen(new GuiBlockList());
+//        }));
+//        addRenderableWidget(new SupportButtonInner(getWidth() / 2 + 79, getHeight() / 2 - 38, 120, 20, I18n.get("xray.input.add_hand"), "xray.tooltips.add_block_in_hand", button -> {
+//            getMinecraft().player.closeContainer();
+//            ItemStack handItem = getMinecraft().player.getItemInHand(InteractionHand.MAIN_HAND);
+//
+//            // Check if the hand item is a block or not
+//            if (!(handItem.getItem() instanceof BlockItem)) {
+//                getMinecraft().player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.invalid_hand", handItem.getHoverName().getString())), false);
+//                return;
+//            }
+//
+//            getMinecraft().setScreen(new GuiAddBlock(((BlockItem) handItem.getItem()).getBlock(), GuiSelectionScreenEntity::new));
+//        }));
+//        addRenderableWidget(new SupportButtonInner(getWidth() / 2 + 79, getHeight() / 2 - 16, 120, 20, I18n.get("xray.input.add_look"), "xray.tooltips.add_block_looking_at", button -> {
+//            Player player = getMinecraft().player;
+//            if (getMinecraft().level == null || player == null)
+//                return;
+//
+//            this.onClose();
+//            try {
+//                Vec3 look = player.getLookAngle();
+//                Vec3 start = new Vec3(player.blockPosition().getX(), player.blockPosition().getY() + player.getEyeHeight(), player.blockPosition().getZ());
+//                Vec3 end = new Vec3(player.blockPosition().getX() + look.x * 100, player.blockPosition().getY() + player.getEyeHeight() + look.y * 100, player.blockPosition().getZ() + look.z * 100);
+//
+//                ClipContext context = new ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player);
+//                BlockHitResult result = getMinecraft().level.clip(context);
+//
+//                if (result.getType() == HitResult.Type.BLOCK) {
+//                    Block lookingAt = getMinecraft().level.getBlockState(result.getBlockPos()).getBlock();
+//
+//                    player.closeContainer();
+//                    getMinecraft().setScreen(new GuiAddBlock(lookingAt, GuiSelectionScreenEntity::new));
+//                } else
+//                    player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
+//            } catch (NullPointerException ex) {
+//                player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.thats_odd")), false);
+//            }
+//        }));
+//
+//        addRenderableWidget(distButtons = new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 + 6, 120, 20, I18n.get("xray.input.show-lava", Controller.isLavaActive()), "xray.tooltips.show_lava", button -> {
+//            Controller.toggleLava();
+//            button.setMessage(Component.translatable("xray.input.show-lava", Controller.isLavaActive()));
+//        }));
 
         addRenderableWidget(distButtons = new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 + 36, 120, 20, I18n.get("xray.input.distance", Controller.getVisualRadius()), "xray.tooltips.distance", button -> {
             Controller.incrementCurrentDist();
             button.setMessage(Component.translatable("xray.input.distance", Controller.getVisualRadius()));
         }));
-        addRenderableWidget(new Button(getWidth() / 2 + 79, getHeight() / 2 + 58, 60, 20, Component.translatable("xray.single.help"), button -> {
-            getMinecraft().player.closeContainer();
-            getMinecraft().setScreen(new GuiHelp());
-        }));
+//        addRenderableWidget(new Button(getWidth() / 2 + 79, getHeight() / 2 + 58, 60, 20, Component.translatable("xray.single.help"), button -> {
+//            getMinecraft().player.closeContainer();
+//            getMinecraft().setScreen(new GuiHelp());
+//        }));
         addRenderableWidget(new Button((getWidth() / 2 + 79) + 62, getHeight() / 2 + 58, 59, 20, Component.translatable("xray.single.close"), button -> {
             this.onClose();
         }));
@@ -171,7 +173,7 @@ public class GuiSelectionScreenEntity extends GuiBase {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (!search.isFocused() && keyCode == KeyBindings.toggleGui.getKey().getValue()) {
+        if (!search.isFocused() && keyCode == KeyBindings.toggleEntityXRayGui.getKey().getValue()) {
             this.onClose();
             return true;
         }
@@ -183,19 +185,19 @@ public class GuiSelectionScreenEntity extends GuiBase {
             return;
 
         if (search.getValue().equals("")) {
-            this.itemList = this.originalList;
-            this.scrollList.updateEntries(this.itemList);
+            this.entityList = this.originalList;
+            this.scrollList.updateEntries(this.entityList);
             lastSearch = "";
             return;
         }
 
-        this.itemList = this.originalList.stream()
-                .filter(b -> b.getEntryName().toLowerCase().contains(search.getValue().toLowerCase()))
+        this.entityList = this.originalList.stream()
+                .filter(b -> b.getEntityType().toShortString().toLowerCase().contains(search.getValue().toLowerCase()))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        this.itemList.sort(Comparator.comparingInt(BlockData::getOrder));
+        this.entityList.sort(Comparator.comparing(EntityData::isDrawing));
 
-        this.scrollList.updateEntries(this.itemList);
+        this.scrollList.updateEntries(this.entityList);
         lastSearch = search.getValue();
     }
 
@@ -248,60 +250,61 @@ public class GuiSelectionScreenEntity extends GuiBase {
         }
     }
 
-    static class ScrollingBlockList extends ScrollingList<ScrollingBlockList.BlockSlot> {
+    static class ScrollingEntityList extends ScrollingList<ScrollingEntityList.EntitySlot> {
         static final int SLOT_HEIGHT = 35;
         public GuiSelectionScreenEntity parent;
 
-        ScrollingBlockList(int x, int y, int width, int height, List<BlockData> blocks, GuiSelectionScreenEntity parent) {
+        ScrollingEntityList(int x, int y, int width, int height, List<EntityData> blocks, GuiSelectionScreenEntity parent) {
             super(x, y, width, height, SLOT_HEIGHT);
             this.updateEntries(blocks);
             this.parent = parent;
         }
 
-        public void setSelected(@Nullable BlockSlot entry, int mouse) {
+        public void setSelected(@Nullable EntitySlot entry, int mouse) {
             if (entry == null)
                 return;
 
             if (GuiSelectionScreenEntity.hasShiftDown()) {
                 Minecraft.getInstance().player.closeContainer();
-                Minecraft.getInstance().setScreen(new GuiEdit(entry.block));
+//                Minecraft.getInstance().setScreen(new GuiEdit(entry.entity));
                 return;
             }
 
-            Controller.getBlockStore().toggleDrawing(entry.block);
+            ClientController.entityStore.toggleDrawing(entry.entity.getEntityType());
             ClientController.blockStore.write(new ArrayList<>(Controller.getBlockStore().getStore().values()));
         }
 
-        void updateEntries(List<BlockData> blocks) {
+        void updateEntries(List<EntityData> entities) {
             this.clearEntries();
-            blocks.forEach(block -> this.addEntry(new BlockSlot(block, this))); // @mcp: addEntry = addEntry
+            entities.forEach(block -> this.addEntry(new EntitySlot(block, this))); // @mcp: addEntry = addEntry
         }
 
-        public static class BlockSlot extends Entry<BlockSlot> {
-            BlockData block;
-            ScrollingBlockList parent;
+        public static class EntitySlot extends Entry<EntitySlot> {
+            EntityData entity;
+            ScrollingEntityList parent;
 
-            BlockSlot(BlockData block, ScrollingBlockList parent) {
-                this.block = block;
+            EntitySlot(EntityData entity, ScrollingEntityList parent) {
+                this.entity = entity;
                 this.parent = parent;
             }
 
-            public BlockData getBlock() {
-                return block;
+            public EntityData getEntity() {
+                return entity;
             }
 
             @Override
             public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
-                BlockData blockData = this.block;
+                EntityData entityData = this.entity;
 
                 Font font = Minecraft.getInstance().font;
 
-                font.draw(stack, blockData.getEntryName(), left + 35, top + 7, 0xFFFFFF);
-                font.draw(stack, blockData.isDrawing() ? "Enabled" : "Disabled", left + 35, top + 17, blockData.isDrawing() ? Color.GREEN.getRGB() : Color.RED.getRGB());
+                font.draw(stack, entityData.getEntityType().toShortString(), left + 35, top + 7, 0xFFFFFF);
+                font.draw(stack, entityData.isDrawing() ? "Enabled" : "Disabled", left + 35, top + 17, entity.isDrawing() ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
-                Lighting.setupFor3DItems();
-                Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(blockData.getItemStack(), left + 8, top + 7);
-                Lighting.setupForFlatItems();
+//                Lighting.setupFor3DItems();
+//                //Minecraft.getInstance().getEntityRenderDispatcher().getRenderer().render();
+//                Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(blockData.getItemStack(), left + 8, top + 7);
+//                Lighting.setupForFlatItems();
 
                 if (mouseX > left && mouseX < (left + entryWidth) && mouseY > top && mouseY < (top + entryHeight) && mouseY < (this.parent.getTop() + this.parent.getHeight()) && mouseY > this.parent.getTop()) {
                     this.parent.parent.renderTooltip(
@@ -312,7 +315,7 @@ public class GuiSelectionScreenEntity extends GuiBase {
                     );
                 }
 
-                Color color = new Color(blockData.getColor());
+                Color color = new Color(entityData.getColor());
 
                 stack.pushPose();
                 RenderSystem.enableBlend();
