@@ -170,11 +170,17 @@ public class RenderEnqueue {
 		for (EntityData entityData : entityStore.getStore().values()){
 			if (entityData.isDrawing()){
 				List<? extends Entity> EntityFoundList = new ArrayList<>();
+
+				//EntityFoundList.get(1).getBoundingBox()
+
 				EntityFoundList = world.getEntities(entityData.getEntityType(),searchAABB, Entity::isAlive);
 				if (!EntityFoundList.isEmpty()){
 					EntityFoundList.forEach(individual -> {
-						Controller.EntitiesNeededRender.add(individual);
-						renderEntityQueue.add(new RenderEntityProps(individual.getBoundingBox(),entityData.getColor()));
+
+						if(individual != player){
+							Controller.EntitiesNeededRender.add(individual);
+							renderEntityQueue.add(new RenderEntityProps(individual.getBoundingBox(),entityData.getColor()));
+						}
 						/////for debug
 						//player.displayClientMessage(Component.literal(renderEntityQueue.toString()),true);
 						//System.out.println(Component.literal(renderEntityQueue.toString()));

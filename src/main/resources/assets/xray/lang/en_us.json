@@ -66,5 +66,6 @@
   "xray.config.finde": "find entities trial",
   "xray.toggle.finde": "start to find entities",
   "entity.xray.gui": "toggle the entity xray gui",
-  "xray.to.exray" : "Entity Xray"
+  "xray.to.exray" : "Entity Xray",
+  "entity.xray.outline": "Outline Mode:%s"
 }

@@ -66,16 +66,6 @@ public class ClientController {
             entityStore.write();
         }
 
-//        System.out.println(0);
-//
-//        System.out.println(1);
-//        ;
-//        System.out.println(entityStore.getStore().isEmpty());
-//        System.out.println(2);
-//        entityStore.toggleDrawing(EntityType.ALLAY);
-//        System.out.println(3);
-//        entityStore.write();
-//        System.out.println(4);
     }
 
     private static void onLoadComplete(FMLLoadCompleteEvent event) {

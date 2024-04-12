@@ -10,6 +10,7 @@ import net.minecraftforge.client.gui.widget.ForgeSlider;
 import org.apache.commons.lang3.tuple.Pair;
 import pro.mikey.xray.ClientController;
 import pro.mikey.xray.gui.GuiSelectionScreen;
+import pro.mikey.xray.gui.GuiSelectionScreenEntity;
 import pro.mikey.xray.gui.utils.GuiBase;
 import pro.mikey.xray.utils.BlockData;
 import pro.mikey.xray.utils.EntityData;
@@ -44,7 +45,7 @@ public class EntityGuiEdit extends GuiBase {
 
         addRenderableWidget(new Button((getWidth() / 2) + 78, getHeight() / 2 + 58, 120, 20, Component.translatable("xray.single.cancel"), b -> {
             this.onClose();
-            this.getMinecraft().setScreen(new GuiSelectionScreen());
+            this.getMinecraft().setScreen(new GuiSelectionScreenEntity());
         }));
         addRenderableWidget(new Button(getWidth() / 2 - 138, getHeight() / 2 + 83, 202, 20, Component.translatable("xray.single.save"), b -> {
             EntityData entity = new EntityData(
@@ -60,7 +61,7 @@ public class EntityGuiEdit extends GuiBase {
 
             ClientController.entityStore.write();
             this.onClose();
-            getMinecraft().setScreen(new GuiSelectionScreen());
+            getMinecraft().setScreen(new GuiSelectionScreenEntity());
         }));
 
         addRenderableWidget(redSlider = new ForgeSlider(getWidth() / 2 - 138, getHeight() / 2 + 7, 202, 20, Component.translatable("xray.color.red"), Component.empty(), 0, 255, (entityData.getColor() >> 16 & 0xff), true));

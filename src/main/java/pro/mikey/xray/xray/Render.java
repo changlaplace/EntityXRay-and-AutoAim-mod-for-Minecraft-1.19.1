@@ -8,6 +8,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import org.lwjgl.opengl.GL11;
 
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.OutlineBufferSource
 public class Render {
     private static VertexBuffer vertexBuffer;
     public static boolean requestedRefresh = false;
@@ -123,6 +125,7 @@ public class Render {
 
             ///////
             //GL11.glLineWidth(50);
+//            OutlineBufferSource
 
             Controller.EntitysyncRenderList.forEach(blockProps -> {
                 if (blockProps == null) {

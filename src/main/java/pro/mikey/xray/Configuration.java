@@ -34,6 +34,7 @@ public class Configuration
         public final ForgeConfigSpec.BooleanValue lavaActive;
         ///////////////////////////
         public ForgeConfigSpec.IntValue EntityRadius;
+        public ForgeConfigSpec.BooleanValue EntityOutlineMode;
         //////////////////////////
 
         Store() {
@@ -50,6 +51,9 @@ public class Configuration
             EntityRadius = BUILDER
                     .comment("DO NOT TOUCH!", "This is not for you.")
                     .defineInRange("EntityRadius", 2, 0, 5);
+            EntityOutlineMode = BUILDER
+                    .comment("Toggle if u want show outline or BoundBox")
+                    .define("EntityOutlineMode", false);
 
             BUILDER.pop();
         }
@@ -60,6 +64,6 @@ public class Configuration
 
 
     //////XRayEntity
-    public static int EntityXRayRadius;
+
 
 }

@@ -110,7 +110,21 @@ public class Controller {
         else
             Configuration.store.radius.set(0);
     }
+    /////EXray
+    public static void incrementEntityCurrentDist() {
+        if (Configuration.store.EntityRadius.get() < maxStepsToScan)
+            Configuration.store.EntityRadius.set(Configuration.store.EntityRadius.get() + 1);
+        else
+            Configuration.store.EntityRadius.set(0);
+    }
 
+    public static void switchOutlineMode(){
+        if (Configuration.store.EntityOutlineMode.get() == Boolean.FALSE)
+            Configuration.store.EntityOutlineMode.set(Boolean.TRUE);
+        else
+            Configuration.store.EntityOutlineMode.set(Boolean.FALSE);
+    }
+    ///////
     public static void decrementCurrentDist() {
         if (Configuration.store.radius.get() > 0)
             Configuration.store.radius.set(Configuration.store.radius.get() - 1);

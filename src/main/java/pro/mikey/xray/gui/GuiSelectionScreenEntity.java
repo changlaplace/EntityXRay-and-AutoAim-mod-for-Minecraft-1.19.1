@@ -111,11 +111,7 @@ public class GuiSelectionScreenEntity extends GuiBase {
         this.search = new EditBox(getFontRender(), getWidth() / 2 - 137, getHeight() / 2 - 105, 202, 18, Component.empty());
         this.search.setCanLoseFocus(true);
 
-//        // side bar buttons
-//        addRenderableWidget(new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 - 60, 120, 20, I18n.get("xray.input.add"), "xray.tooltips.add_block", button -> {
-//            getMinecraft().player.closeContainer();
-//            getMinecraft().setScreen(new GuiBlockList());
-//        }));
+
 //        addRenderableWidget(new SupportButtonInner(getWidth() / 2 + 79, getHeight() / 2 - 38, 120, 20, I18n.get("xray.input.add_hand"), "xray.tooltips.add_block_in_hand", button -> {
 //            getMinecraft().player.closeContainer();
 //            ItemStack handItem = getMinecraft().player.getItemInHand(InteractionHand.MAIN_HAND);
@@ -158,14 +154,19 @@ public class GuiSelectionScreenEntity extends GuiBase {
 //            Controller.toggleLava();
 //            button.setMessage(Component.translatable("xray.input.show-lava", Controller.isLavaActive()));
 //        }));
+        // side bar buttons
+        addRenderableWidget(new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 - 60, 120, 20, I18n.get("entity.xray.outline",Configuration.store.EntityOutlineMode.get()), "xray.tooltips.add_block", button -> {
+            Controller.switchOutlineMode();
+            button.setMessage(Component.translatable("entity.xray.outline",Configuration.store.EntityOutlineMode.get()));
+        }));
         addRenderableWidget(new Button(getWidth() / 2 + 79, getHeight() / 2 + 58, 60, 20, Component.translatable("xray.single.help"), button -> {
             getMinecraft().player.closeContainer();
             getMinecraft().setScreen(new GuiHelp());
         }));
 
-        addRenderableWidget(distButtons = new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 + 36, 120, 20, I18n.get("xray.input.distance", Controller.getVisualRadius()), "xray.tooltips.distance", button -> {
-            Controller.incrementCurrentDist();
-            button.setMessage(Component.translatable("xray.input.distance", Controller.getVisualRadius()));
+        addRenderableWidget(distButtons = new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 + 36, 120, 20, I18n.get("xray.input.distance", Configuration.store.EntityRadius.get()*3), "xray.tooltips.distance", button -> {
+            Controller.incrementEntityCurrentDist();
+            button.setMessage(Component.translatable("xray.input.distance", Configuration.store.EntityRadius.get()*3));
         }));
 
 
@@ -241,9 +242,11 @@ public class GuiSelectionScreenEntity extends GuiBase {
     @Override
     public void removed() {
         Configuration.store.EntityRadius.save();
+        Configuration.store.EntityOutlineMode.save();
         //ClientController.blockStore.write(new ArrayList<>(Controller.getBlockStore().getStore().values()));
         ClientController.entityStore.write();
         //Controller.requestBlockFinder(true);
+
         super.removed();
     }
 
