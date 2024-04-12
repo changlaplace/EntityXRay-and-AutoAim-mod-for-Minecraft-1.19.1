@@ -67,5 +67,7 @@
   "xray.toggle.finde": "start to find entities",
   "entity.xray.gui": "toggle the entity xray gui",
   "xray.to.exray" : "Entity Xray",
-  "entity.xray.outline": "Outline Mode:%s"
+  "entity.xray.outline": "Outline Mode:%s",
+
+  "entity.xray.edit2" : "Hold ctrl to en/disable autoaim"
 }

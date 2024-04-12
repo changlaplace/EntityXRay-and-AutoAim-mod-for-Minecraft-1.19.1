@@ -40,6 +40,8 @@ public class EntityStore {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Path STORE_FILE = Minecraft.getInstance().gameDirectory.toPath().resolve(String.format("config/%s/entity_store.json", XRay.MOD_ID));
     private static final Gson PRETTY_JSON = new GsonBuilder().setPrettyPrinting().create();
+    /////autoaim
+    public static ArrayList<EntityType> AutoAimEntityTypes = new ArrayList<>();
 
     public void put(EntityData data) {
         if( this.storeReference.containsKey(data.getEntityType()) )
@@ -144,6 +146,50 @@ public class EntityStore {
 
         return new ArrayList<>();
     }
+    private static final Path STORE_FILE_AUTOAIM = Minecraft.getInstance().gameDirectory.toPath().resolve(String.format("config/%s/AutoAimEntityTypes.json", XRay.MOD_ID));
+
+    public ArrayList<EntityType> getAutoAimEntityTypes(){
+        return AutoAimEntityTypes;
+    }
+    public void writeAutoAim(){
+        ArrayList<String> SimpleAutoAimData = new ArrayList<>();
+        AutoAimEntityTypes.add(EntityType.PIG);
+        for (EntityType entityType : AutoAimEntityTypes){
+            SimpleAutoAimData.add(entityType.toShortString());
+        }
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(STORE_FILE_AUTOAIM.toFile()))) {
+            PRETTY_JSON.toJson(SimpleAutoAimData, writer);
+        } catch (IOException e) {
+            LOGGER.error("Failed to write json data to {}", STORE_FILE_AUTOAIM);
+        }
+    }
+    public void readAutoAim(){
+
+        if (!Files.exists(STORE_FILE_AUTOAIM))
+            AutoAimEntityTypes = new ArrayList<>();
+        else{
+            try {
+                ArrayList<String> SimpleAutoAimData = new ArrayList<>();
+                Type type = new TypeToken<ArrayList<String>>() {
+                }.getType();
+                try (BufferedReader reader = new BufferedReader(new FileReader(STORE_FILE_AUTOAIM.toFile()))) {
+                    SimpleAutoAimData = PRETTY_JSON.fromJson(reader, type);
+                    for ( EntityType entityType : ForgeRegistries.ENTITY_TYPES ) {
+                        if (SimpleAutoAimData.contains(entityType.toShortString())){
+                            AutoAimEntityTypes.add(entityType);
+                        }
+                    }
+                } catch (JsonSyntaxException ex) {
+                    XRay.logger.log(Level.ERROR, "Failed to read json data from " + STORE_FILE_AUTOAIM);
+                }
+            } catch (IOException e) {
+                XRay.logger.log(Level.ERROR, "Failed to read json data from " + STORE_FILE_AUTOAIM);
+            }
 
 
+        }
+
+
+
+    }
 }

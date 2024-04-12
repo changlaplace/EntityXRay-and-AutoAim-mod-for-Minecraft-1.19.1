@@ -237,9 +237,8 @@ public class Controller {
             });
         }
     }
-//    public static void finde() {
-//        if (!Configuration.general.showOverlay.get() && Minecraft.getInstance().player != null)
-//            Minecraft.getInstance().player.displayClientMessage(Component.translatable("xray.toggle.finde"), false);
-//        RenderEnqueue.entityFinder();
-//    }
+////////////AutoAim data
+    public static void AutoAimWrite(){
+
+    }
 }

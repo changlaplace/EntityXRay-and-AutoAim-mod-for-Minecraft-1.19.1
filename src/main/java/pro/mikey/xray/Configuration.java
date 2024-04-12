@@ -35,6 +35,7 @@ public class Configuration
         ///////////////////////////
         public ForgeConfigSpec.IntValue EntityRadius;
         public ForgeConfigSpec.BooleanValue EntityOutlineMode;
+
         //////////////////////////
 
         Store() {

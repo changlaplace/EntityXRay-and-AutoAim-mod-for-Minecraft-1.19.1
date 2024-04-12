@@ -275,6 +275,16 @@ public class GuiSelectionScreenEntity extends GuiBase {
                 Minecraft.getInstance().setScreen(new EntityGuiEdit(entry.entity));
                 return;
             }
+            if (GuiSelectionScreenEntity.hasControlDown()) {
+                if (ClientController.entityStore.AutoAimEntityTypes.contains(entry.entity.getEntityType())){
+                    ClientController.entityStore.AutoAimEntityTypes.remove(entry.entity.getEntityType());
+                }
+                else {
+                    ClientController.entityStore.AutoAimEntityTypes.add(entry.entity.getEntityType());
+                }
+                ClientController.entityStore.writeAutoAim();
+                return;
+            }
 
             ClientController.entityStore.toggleDrawing(entry.entity.getEntityType());
             ClientController.blockStore.write(new ArrayList<>(Controller.getBlockStore().getStore().values()));
@@ -311,11 +321,12 @@ public class GuiSelectionScreenEntity extends GuiBase {
 //                //Minecraft.getInstance().getEntityRenderDispatcher().getRenderer().render();
 //                Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(blockData.getItemStack(), left + 8, top + 7);
 //                Lighting.setupForFlatItems();
+                font.draw(stack, ClientController.entityStore.getAutoAimEntityTypes().contains(entityData.getEntityType()) ? "Aimed" : "NotAimed", left + 35, top + 13, entity.isDrawing() ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
                 if (mouseX > left && mouseX < (left + entryWidth) && mouseY > top && mouseY < (top + entryHeight) && mouseY < (this.parent.getTop() + this.parent.getHeight()) && mouseY > this.parent.getTop()) {
                     this.parent.parent.renderTooltip(
                             stack,
-                            Language.getInstance().getVisualOrder(Arrays.asList(Component.translatable("xray.tooltips.edit1"), Component.translatable("xray.tooltips.edit2"))),
+                            Language.getInstance().getVisualOrder(Arrays.asList(Component.translatable("xray.tooltips.edit1"), Component.translatable("xray.tooltips.edit2"),Component.translatable("entity.xray.edit2"))),
                             left + 15,
                             (entryIdx == this.parent.children().size() - 1 ? (top - (entryHeight - 20)) : (top + (entryHeight + 15))) // @mcp: children = getEntries
                     );

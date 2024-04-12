@@ -32,6 +32,7 @@ public class ClientController {
     //////////////////////
     public static EntityStore entityStore = new EntityStore();
 
+
     public static void setup() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -42,6 +43,9 @@ public class ClientController {
 
         // Keybindings
         MinecraftForge.EVENT_BUS.register(KeyBindings.class);
+
+        //AutoAim
+        entityStore.writeAutoAim();
     }
 
     private static void onSetup(final FMLCommonSetupEvent event) {
