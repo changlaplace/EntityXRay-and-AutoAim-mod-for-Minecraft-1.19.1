@@ -37,6 +37,18 @@ public class Configuration
         public ForgeConfigSpec.BooleanValue EntityOutlineMode;
 
         //////////////////////////
+        //AutoAim
+
+        public ForgeConfigSpec.DoubleValue scrollingspeed;
+        public ForgeConfigSpec.DoubleValue angleofsearch;
+        public ForgeConfigSpec.IntValue delayframe;
+
+        public ForgeConfigSpec.DoubleValue eyerefactor;
+
+
+//        public static float scrollingspeed = 0.3F;
+//        public static float AngleOfSearch = 25.0F;
+//        public static float DelayedFrame = 3;
 
         Store() {
             BUILDER.comment("DO NOT TOUCH!").push("store");
@@ -55,6 +67,22 @@ public class Configuration
             EntityOutlineMode = BUILDER
                     .comment("Toggle if u want show outline or BoundBox")
                     .define("EntityOutlineMode", false);
+
+            scrollingspeed = BUILDER
+                    .comment("This allows you to set your own outline thickness, I find that 1.0 is perfect but others my",
+                            "think differently. The max is 5.0")
+                    .defineInRange("scrolspeed", 0.3, 0, 2);
+
+            angleofsearch = (ForgeConfigSpec.DoubleValue) BUILDER
+                    .comment("Toggle if u want show outline or BoundBox")
+                    .defineInRange("angleofsearch", 25.0,0,180);
+            delayframe = (ForgeConfigSpec.IntValue) BUILDER
+                    .comment("Toggle if u want show outline or BoundBox")
+                    .defineInRange("delayframe", 0,0,200);
+
+            eyerefactor = (ForgeConfigSpec.DoubleValue) BUILDER
+                    .comment("Toggle if u want show outline or BoundBox")
+                    .defineInRange("eyerefactor", 0.2,0,2);
 
             BUILDER.pop();
         }

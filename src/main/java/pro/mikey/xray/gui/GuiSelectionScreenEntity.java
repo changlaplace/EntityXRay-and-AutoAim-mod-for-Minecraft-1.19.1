@@ -112,18 +112,7 @@ public class GuiSelectionScreenEntity extends GuiBase {
         this.search.setCanLoseFocus(true);
 
 
-//        addRenderableWidget(new SupportButtonInner(getWidth() / 2 + 79, getHeight() / 2 - 38, 120, 20, I18n.get("xray.input.add_hand"), "xray.tooltips.add_block_in_hand", button -> {
-//            getMinecraft().player.closeContainer();
-//            ItemStack handItem = getMinecraft().player.getItemInHand(InteractionHand.MAIN_HAND);
 //
-//            // Check if the hand item is a block or not
-//            if (!(handItem.getItem() instanceof BlockItem)) {
-//                getMinecraft().player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.invalid_hand", handItem.getHoverName().getString())), false);
-//                return;
-//            }
-//
-//            getMinecraft().setScreen(new GuiAddBlock(((BlockItem) handItem.getItem()).getBlock(), GuiSelectionScreenEntity::new));
-//        }));
 //        addRenderableWidget(new SupportButtonInner(getWidth() / 2 + 79, getHeight() / 2 - 16, 120, 20, I18n.get("xray.input.add_look"), "xray.tooltips.add_block_looking_at", button -> {
 //            Player player = getMinecraft().player;
 //            if (getMinecraft().level == null || player == null)
@@ -155,13 +144,41 @@ public class GuiSelectionScreenEntity extends GuiBase {
 //            button.setMessage(Component.translatable("xray.input.show-lava", Controller.isLavaActive()));
 //        }));
         // side bar buttons
-        addRenderableWidget(new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 - 60, 120, 20, I18n.get("entity.xray.outline",Configuration.store.EntityOutlineMode.get()), "xray.tooltips.add_block", button -> {
+
+        addRenderableWidget(new SupportButtonInner(getWidth() / 2 + 79, getHeight() / 2 - 60, 120, 20, I18n.get("entity.xray.toggle"), "xray.tooltips.add_block_in_hand", button -> {
+//            if (Controller.isEntityxrayActive() == true){
+//                Controller.setAutoAimActive(false);
+//                Controller.setEntityxrayActive(!Controller.isEntityxrayActive());
+//            }
+//            else{
+//                Controller.setEntityxrayActive(!Controller.isEntityxrayActive());
+//            }
+            Controller.setEntityxrayActive(!Controller.isEntityxrayActive());
+
+        }));
+        ///
+        addRenderableWidget(new SupportButtonInner(getWidth() / 2 + 79, getHeight() / 2 - 38, 120, 20, I18n.get("entity.xray.AutoAimtoggle"), "xray.tooltips.add_block_in_hand", button -> {
+//            if (Controller.isAutoAimActive() == false){
+//                Controller.setEntityxrayActive(true);
+//                Controller.setAutoAimActive(!Controller.isAutoAimActive());
+//            }
+//            else{
+//                Controller.setAutoAimActive(!Controller.isAutoAimActive());
+//            }
+            Controller.setAutoAimActive(!Controller.isAutoAimActive());
+
+
+        }));
+        addRenderableWidget(new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 - 16, 120, 20, I18n.get("entity.xray.outline",Configuration.store.EntityOutlineMode.get()), "xray.tooltips.add_block", button -> {
             Controller.switchOutlineMode();
             button.setMessage(Component.translatable("entity.xray.outline",Configuration.store.EntityOutlineMode.get()));
         }));
-        addRenderableWidget(new Button(getWidth() / 2 + 79, getHeight() / 2 + 58, 60, 20, Component.translatable("xray.single.help"), button -> {
+
+
+
+        addRenderableWidget(new Button(getWidth() / 2 + 79, getHeight() / 2 + 58, 60, 20, Component.translatable("entity.xray.GuiMOre"), button -> {
             getMinecraft().player.closeContainer();
-            getMinecraft().setScreen(new GuiHelp());
+            getMinecraft().setScreen(new AutoAimGuiMore());
         }));
 
         addRenderableWidget(distButtons = new SupportButtonInner((getWidth() / 2) + 79, getHeight() / 2 + 36, 120, 20, I18n.get("xray.input.distance", Configuration.store.EntityRadius.get()*3), "xray.tooltips.distance", button -> {

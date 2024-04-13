@@ -169,6 +169,7 @@ public class RenderEnqueue {
 
 		final AABB searchAABB = player.getBoundingBox().inflate(Configuration.store.EntityRadius.get()*3.0*16).setMinY(-100).setMaxY(320);
 		for (EntityData entityData : entityStore.getStore().values()){
+			Controller.EntitiesNeededRender.clear();
 			if (entityData.isDrawing()){
 				List<? extends Entity> EntityFoundList = new ArrayList<>();
 

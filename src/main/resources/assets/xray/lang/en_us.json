@@ -67,7 +67,14 @@
   "xray.toggle.finde": "start to find entities",
   "entity.xray.gui": "toggle the entity xray gui",
   "xray.to.exray" : "Entity Xray",
-  "entity.xray.outline": "Outline Mode:%s",
+  "entity.xray.outline": "OutlineMode(N.A):%s",
+  "entity.xray.toggle" : "EntitiyXray:toggle",
+  "entity.xray.AutoAimtoggle" : "AutoAim:toggle",
+  "entity.xray.GuiMOre" : "More",
+  "entity.xray.edit2" : "Hold ctrl to en/disable autoaim",
 
-  "entity.xray.edit2" : "Hold ctrl to en/disable autoaim"
+  "entity.AA.scrollspeed": "Scroll Speed",
+  "entity.AA.angleofsearch": "Search FOV",
+  "entity.AA.delay": "Delay Frame ",
+  "entity.AA.eyerefactor": "Headshot Pos "
 }

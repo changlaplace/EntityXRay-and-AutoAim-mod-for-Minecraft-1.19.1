@@ -9,124 +9,39 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import pro.mikey.xray.Configuration;
 
 import java.util.List;
 
 public class Wrapper {
 
     public static Minecraft MC = Minecraft.getInstance();
-    private static boolean supportForControllable;
-
-    /**
-     * @param support if true, it will use the Controllable mod events
-     */
-    public static void setSupportForControllable(boolean support) {
-        supportForControllable = support;
-    }
-
-    /**
-     * @return true if the player is playing
-     */
     public static boolean playerPlaying() {
         return Wrapper.MC.player != null && Wrapper.MC.screen == null;
     }
 
-    /**
-     * @return true if the player is pressing the attack key
-     */
-//    public static boolean attackKeyPressed() {
-//        // could use that as well: GLFW.glfwGetMouseButton(Minecraft.getInstance().getMainWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_RIGHT) == GLFW.GLFW_PRESS;
-//        boolean attackPressed = Wrapper.MC.options.keyAttack.isDown(); // vanilla
-//        attackPressed |= supportForControllable && Controllable.getController() != null && Controllable.getController().getRTriggerValue() != 0.0F; // controller
-//        return attackPressed;
-//    }
 
-    /**
-     * @param maxRange max range to find a block
-     * @return the block ray trace result that represents the block that the player is pointing (within the range given)
-     */
-    public static BlockHitResult getPointedBlock(float maxRange) {
-        return switch (MC.hitResult.getType()) {
-            case BLOCK -> ((BlockHitResult) MC.hitResult);
-            case MISS ->
-                // The block is not within the player's range, so we need to perform a ray trace to find the block the
-                // player is pointing to
-                    Wrapper.rayTrace(maxRange);
-            default -> null;
-        };
-    }
-
-    /**
-     * Performs ray tracing
-     *
-     * @param range the max range to look for blocks - it's actually the vector's length)
-     * @param source the source position - it's actually the vector's position)
-     * @param yaw the raw of the unit from that source - it's the vector's x/z (horizontal) direction
-     * @param pitch the pitch of the vector from that source - it's the vector's y (vertical) direction
-     * @return target.getPos() is instance of BlockPos.Mutable if nothing found, else it's an instance of the thing found.
-     */
-    public static BlockHitResult rayTrace(double range, Vec3 source, float yaw, float pitch) {
-        if (Wrapper.MC.player == null) return null;
-
-        float f2 =  Mth.cos(-yaw   * ((float) Math.PI / 180F) - (float)Math.PI);
-        float f3 =  Mth.sin(-yaw   * ((float) Math.PI / 180F) - (float)Math.PI);
-        float f4 = -Mth.cos(-pitch * ((float) Math.PI / 180F));
-        float f5 =  Mth.sin(-pitch * ((float) Math.PI / 180F));
-        float f6 = f3 * f4;
-        float f7 = f2 * f4;
-        Vec3 vector3d1 = source.add((double)f6 * range, (double)f5 * range, (double)f7 * range);
-
-        return Wrapper.MC.level.clip(
-                new ClipContext(
-                        source,
-                        vector3d1,
-                        ClipContext.Block.OUTLINE,
-                        ClipContext.Fluid.NONE,
-                        Wrapper.MC.player
-                )
-        );
-    }
-
-
-    /**
-     * Performs ray tracing by taking into account the player's view
-     *
-     * @param range range to perform ray tracing
-     * @return result of ray tracing from the player's view within the range
-     */
-    private static BlockHitResult rayTrace(double range) {
-        return Wrapper.rayTrace(
-                range,
-                Wrapper.MC.player.getEyePosition(1.0F),
-                Wrapper.MC.player.getRotationVector().x, // pitch
-                Wrapper.MC.player.getRotationVector().y // yaw
-        );
-    }
-
-    /**
-     * @return true if the player is currently aiming at a mob
-     */
     public static boolean isPlayerAimingMob() {
         return Wrapper.MC.crosshairPickEntity instanceof Mob;
     }
 
-    /**
-     * @param range in blocks, defines the range around the player to scan for entities
-     * @param entityClass the entity type to look for (Check the Entity class: MobEntity.class for mobs for example)
-     * @return all the entities that are within the given range from the player
-     */
-    public static <T extends Entity> List<Entity> getEntitiesAroundPlayer(float range, Class<T> entityClass) {
-        AABB area = new AABB(
-                Wrapper.MC.player.getX() - range,
-                Wrapper.MC.player.getY() - range,
-                Wrapper.MC.player.getZ() - range,
-                Wrapper.MC.player.getX() + range,
-                Wrapper.MC.player.getY() + range,
-                Wrapper.MC.player.getZ() + range
-        );
-
-        return Wrapper.MC.level.getEntitiesOfClass((Class<Entity>) entityClass, area);
-    }
+//    /**
+//     * @param range in blocks, defines the range around the player to scan for entities
+//     * @param entityClass the entity type to look for (Check the Entity class: MobEntity.class for mobs for example)
+//     * @return all the entities that are within the given range from the player
+//     */
+//    public static <T extends Entity> List<Entity> getEntitiesAroundPlayer(float range, Class<T> entityClass) {
+//        AABB area = new AABB(
+//                Wrapper.MC.player.getX() - range,
+//                Wrapper.MC.player.getY() - range,
+//                Wrapper.MC.player.getZ() - range,
+//                Wrapper.MC.player.getX() + range,
+//                Wrapper.MC.player.getY() + range,
+//                Wrapper.MC.player.getZ() + range
+//        );
+//
+//        return Wrapper.MC.level.getEntitiesOfClass((Class<Entity>) entityClass, area);
+//    }
 
     /**
      * @param entities list of entities to scan
@@ -135,6 +50,7 @@ public class Wrapper {
     public static Entity getClosestEntityToCrosshair(List<Entity> entities) {
         float minDist = Float.MAX_VALUE;
         Entity closest = null;
+        float minPosDist = Float.MAX_VALUE;
 
         for(Entity entity : entities){
             // Get distance between the two entities (rotations)
@@ -146,12 +62,24 @@ public class Wrapper {
             float distYaw = Mth.abs(Mth.wrapDegrees(yawPitch[0] - Wrapper.MC.player.getRotationVector().y));
             float distPitch = Mth.abs(Mth.wrapDegrees(yawPitch[1] - Wrapper.MC.player.getRotationVector().x));
             float dist = Mth.sqrt(distYaw*distYaw + distPitch*distPitch);
-
+            float posDist = Mth.sqrt(
+                    (float) (Mth.square(entity.getX()-Wrapper.MC.player.getX())+
+                            Mth.square(entity.getY()-Wrapper.MC.player.getY())+
+                            Mth.square(entity.getZ()-Wrapper.MC.player.getZ()))
+            );
             // Get the closest entity
-            if(dist < minDist) {
+//            if(dist < minDist) {
+//                closest = entity;
+//                minDist = dist;
+//            }
+            if(posDist < minPosDist) {
                 closest = entity;
                 minDist = dist;
+                minPosDist = posDist;
             }
+        }
+        if (minDist > Configuration.store.angleofsearch.get()){
+            return null;
         }
 
         return closest;

@@ -45,7 +45,7 @@ public class ClientController {
         MinecraftForge.EVENT_BUS.register(KeyBindings.class);
 
         //AutoAim
-        entityStore.writeAutoAim();
+        entityStore.readAutoAim();
     }
 
     private static void onSetup(final FMLCommonSetupEvent event) {

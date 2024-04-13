@@ -46,6 +46,16 @@ public class Controller {
     private static boolean xrayActive = false; // Off by default
     private static boolean lavaActive = Configuration.store.lavaActive.get();
 
+    public static boolean isAutoAimActive() {
+        return AutoAimActive;
+    }
+
+    public static void setAutoAimActive(boolean autoAimActive) {
+        AutoAimActive = autoAimActive;
+    }
+
+    private static boolean AutoAimActive =false;
+
     public static BlockStore getBlockStore() {
         return blockStore;
     }
@@ -195,6 +205,15 @@ public class Controller {
 
     //Down are the methods for entities finding########################################
     public static boolean EntityxrayActive = false;
+
+    public static boolean isEntityxrayActive() {
+        return EntityxrayActive;
+    }
+
+    public static void setEntityxrayActive(boolean entityxrayActive) {
+        EntityxrayActive = entityxrayActive;
+    }
+
     public static Set<Entity> EntitiesNeededRender = Collections.synchronizedSet(new HashSet<>());
     public static Set<RenderEntityProps> EntitysyncRenderList = Collections.synchronizedSet(new HashSet<>());
     public static void toggleEntityXRay() {
