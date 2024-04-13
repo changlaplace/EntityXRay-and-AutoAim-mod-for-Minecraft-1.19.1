@@ -72,14 +72,11 @@ public class Wrapper {
 //                closest = entity;
 //                minDist = dist;
 //            }
-            if(posDist < minPosDist) {
+            if(posDist < minPosDist && dist < Configuration.store.angleofsearch.get()) {
                 closest = entity;
                 minDist = dist;
                 minPosDist = posDist;
             }
-        }
-        if (minDist > Configuration.store.angleofsearch.get()){
-            return null;
         }
 
         return closest;
