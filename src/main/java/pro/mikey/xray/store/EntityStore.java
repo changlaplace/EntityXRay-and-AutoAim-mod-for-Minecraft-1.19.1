@@ -153,7 +153,6 @@ public class EntityStore {
     }
     public void writeAutoAim(){
         ArrayList<String> SimpleAutoAimData = new ArrayList<>();
-        AutoAimEntityTypes.add(EntityType.PIG);
         for (EntityType entityType : AutoAimEntityTypes){
             SimpleAutoAimData.add(entityType.toShortString());
         }

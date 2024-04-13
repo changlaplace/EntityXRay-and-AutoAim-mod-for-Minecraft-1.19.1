@@ -321,7 +321,7 @@ public class GuiSelectionScreenEntity extends GuiBase {
 //                //Minecraft.getInstance().getEntityRenderDispatcher().getRenderer().render();
 //                Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(blockData.getItemStack(), left + 8, top + 7);
 //                Lighting.setupForFlatItems();
-                font.draw(stack, ClientController.entityStore.getAutoAimEntityTypes().contains(entityData.getEntityType()) ? "Aimed" : "NotAimed", left + 35, top + 13, entity.isDrawing() ? Color.GREEN.getRGB() : Color.RED.getRGB());
+                font.draw(stack, ClientController.entityStore.getAutoAimEntityTypes().contains(entityData.getEntityType()) ? "Aimed" : "NotAimed", left + 120, top + 17, ClientController.entityStore.getAutoAimEntityTypes().contains(entityData.getEntityType()) ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
                 if (mouseX > left && mouseX < (left + entryWidth) && mouseY > top && mouseY < (top + entryHeight) && mouseY < (this.parent.getTop() + this.parent.getHeight()) && mouseY > this.parent.getTop()) {
                     this.parent.parent.renderTooltip(

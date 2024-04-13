@@ -166,6 +166,7 @@ public class RenderEnqueue {
 		final Set<RenderEntityProps> renderEntityQueue = new HashSet<>();
 		final Level world = Minecraft.getInstance().level;
 		final Player player = Minecraft.getInstance().player;
+
 		final AABB searchAABB = player.getBoundingBox().inflate(Configuration.store.EntityRadius.get()*3.0*16).setMinY(-100).setMaxY(320);
 		for (EntityData entityData : entityStore.getStore().values()){
 			if (entityData.isDrawing()){
